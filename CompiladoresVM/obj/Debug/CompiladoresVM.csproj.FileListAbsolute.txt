@@ -1,0 +1,10 @@
+C:\Users\15593866\source\repos\CompiladoresVM\CompiladoresVM\bin\Debug\CompiladoresVM.exe.config
+C:\Users\15593866\source\repos\CompiladoresVM\CompiladoresVM\bin\Debug\CompiladoresVM.exe
+C:\Users\15593866\source\repos\CompiladoresVM\CompiladoresVM\bin\Debug\CompiladoresVM.pdb
+C:\Users\15593866\source\repos\CompiladoresVM\CompiladoresVM\obj\Debug\CompiladoresVM.csprojResolveAssemblyReference.cache
+C:\Users\15593866\source\repos\CompiladoresVM\CompiladoresVM\obj\Debug\CompiladoresVM.Form1.resources
+C:\Users\15593866\source\repos\CompiladoresVM\CompiladoresVM\obj\Debug\CompiladoresVM.Properties.Resources.resources
+C:\Users\15593866\source\repos\CompiladoresVM\CompiladoresVM\obj\Debug\CompiladoresVM.csproj.GenerateResource.cache
+C:\Users\15593866\source\repos\CompiladoresVM\CompiladoresVM\obj\Debug\CompiladoresVM.csproj.CoreCompileInputs.cache
+C:\Users\15593866\source\repos\CompiladoresVM\CompiladoresVM\obj\Debug\CompiladoresVM.exe
+C:\Users\15593866\source\repos\CompiladoresVM\CompiladoresVM\obj\Debug\CompiladoresVM.pdb
