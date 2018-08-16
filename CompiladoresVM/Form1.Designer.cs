@@ -35,9 +35,6 @@
             this.abrirToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.sairToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.executarToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.execuçãoDiretaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.passoAPassoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.pararToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.continuarToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.listViewMemoryProgram = new System.Windows.Forms.ListView();
             this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -95,7 +92,6 @@
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.arquivoToolStripMenuItem,
             this.executarToolStripMenuItem,
-            this.pararToolStripMenuItem,
             this.continuarToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
@@ -127,38 +123,16 @@
             // 
             // executarToolStripMenuItem
             // 
-            this.executarToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.execuçãoDiretaToolStripMenuItem,
-            this.passoAPassoToolStripMenuItem});
             this.executarToolStripMenuItem.Name = "executarToolStripMenuItem";
             this.executarToolStripMenuItem.Size = new System.Drawing.Size(62, 20);
             this.executarToolStripMenuItem.Text = "Executar";
-            // 
-            // execuçãoDiretaToolStripMenuItem
-            // 
-            this.execuçãoDiretaToolStripMenuItem.Name = "execuçãoDiretaToolStripMenuItem";
-            this.execuçãoDiretaToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.execuçãoDiretaToolStripMenuItem.Text = "Execução direta";
-            this.execuçãoDiretaToolStripMenuItem.Click += new System.EventHandler(this.execuçãoDiretaToolStripMenuItem_Click);
-            // 
-            // passoAPassoToolStripMenuItem
-            // 
-            this.passoAPassoToolStripMenuItem.Name = "passoAPassoToolStripMenuItem";
-            this.passoAPassoToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.passoAPassoToolStripMenuItem.Text = "Passo a passo";
-            this.passoAPassoToolStripMenuItem.Click += new System.EventHandler(this.passoAPassoToolStripMenuItem_Click);
-            // 
-            // pararToolStripMenuItem
-            // 
-            this.pararToolStripMenuItem.Name = "pararToolStripMenuItem";
-            this.pararToolStripMenuItem.Size = new System.Drawing.Size(45, 20);
-            this.pararToolStripMenuItem.Text = "Parar";
+            this.executarToolStripMenuItem.Click += new System.EventHandler(this.executarToolStripMenuItem_Click);
             // 
             // continuarToolStripMenuItem
             // 
             this.continuarToolStripMenuItem.Name = "continuarToolStripMenuItem";
-            this.continuarToolStripMenuItem.Size = new System.Drawing.Size(66, 20);
-            this.continuarToolStripMenuItem.Text = "Continuar";
+            this.continuarToolStripMenuItem.Size = new System.Drawing.Size(87, 20);
+            this.continuarToolStripMenuItem.Text = "Passo a passo";
             this.continuarToolStripMenuItem.Click += new System.EventHandler(this.continuarToolStripMenuItem_Click);
             // 
             // listViewMemoryProgram
@@ -446,8 +420,6 @@
         private System.Windows.Forms.ToolStripMenuItem abrirToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem sairToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem executarToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem execuçãoDiretaToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem passoAPassoToolStripMenuItem;
         private System.Windows.Forms.ListView listViewMemoryProgram;
         private System.Windows.Forms.ColumnHeader columnHeader1;
         private System.Windows.Forms.ColumnHeader columnHeader2;
@@ -461,7 +433,6 @@
         private System.Windows.Forms.ToolStripMenuItem ativardesativarBreakpointToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem removerBreakpointToolStripMenuItem;
         private System.Windows.Forms.GroupBox groupBox1;
-        private System.Windows.Forms.ToolStripMenuItem pararToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem continuarToolStripMenuItem;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.GroupBox groupBox3;

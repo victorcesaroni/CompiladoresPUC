@@ -90,7 +90,13 @@ namespace CompiladoresVM
             listViewMemoryProgram.Select();
         }
 
-        private void execuçãoDiretaToolStripMenuItem_Click(object sender, EventArgs e)
+        private void continuarToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            vm.Run(true, true);
+            UpdateInterface();
+        }
+
+        private void executarToolStripMenuItem_Click(object sender, EventArgs e)
         {
             //vm.Run(false, false);
 
@@ -104,18 +110,6 @@ namespace CompiladoresVM
                     break;
             }
 
-            UpdateInterface();
-        }
-
-        private void passoAPassoToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            vm.Run(true, true);
-            UpdateInterface();
-        }
-
-        private void continuarToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            vm.Run(true, true);
             UpdateInterface();
         }
     }

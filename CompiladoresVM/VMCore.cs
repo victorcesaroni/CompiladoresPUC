@@ -433,7 +433,7 @@ namespace CompiladoresVM
                         registers.I = labelTable[instruction.arg1];
                         break;
                     case "JMPF":
-                        registers.I++;
+                        registers.I = labelTable[instruction.arg1];
                         break;
                     case "NULL":
                         registers.I++;
@@ -445,9 +445,27 @@ namespace CompiladoresVM
                         registers.I++;
                         break;
                     case "ALLOC":
+                        {
+                            int m = int.Parse(instruction.arg1);
+                            int n = int.Parse(instruction.arg2);
+                            for (int k = 0; k < n; k++)
+                            {
+                                registers.S++;
+                                memory.M[registers.S] = memory.M[m + k];
+                            }
+                        }
                         registers.I++;
                         break;
                     case "DALLOC":
+                        {
+                            int m = int.Parse(instruction.arg1);
+                            int n = int.Parse(instruction.arg2);
+                            for (int k = n - 1; k >= 0; k--)
+                            {
+                                registers.S--;
+                                memory.M[m + k] = memory.M[registers.S];
+                            }
+                        }
                         registers.I++;
                         break;
                     case "CALL":
