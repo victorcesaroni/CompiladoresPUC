@@ -9,49 +9,33 @@ namespace CompiladoresVM
 {
     class VMCore
     {
-        public enum InstructionOpcode : UInt16
-        {
-            LDC,
-            LDV,
-            ADD,
-            SUB,
-            MULT,
-            DIVI,
-            INV,
-            AND,
-            OR,
-            NEG,
-            CME,
-            CMA,
-            CEQ,
-            CDIF,
-            CMEQ,
-            CMAQ,
-            START,
-            HLT,
-            STR,
-            JMP,
-            JMPF,
-            NULL,
-            RD,
-            PRN,
-            ALLOC,
-            DALLOC,
-            CALL,
-            RETURN,
-        };
-
         public class Instruction
         {
-            public InstructionOpcode opcode;
-            public UInt32 arg1;
-            public UInt32 arg2;
+            public string opcode;
+            public string arg1;
+            public string arg2;
             public int numArgs;
+            public bool hasComment;
             public string comment;
+            public bool isLabel;
+            public string label;
+            public bool useLabel;
 
             public Instruction()
             {
 
+            }
+
+            public override string ToString()
+            {
+                if (numArgs == 0)
+                    return opcode.ToString() + " #" + comment;
+                if (numArgs == 1)
+                    return opcode.ToString() + " " + arg1.ToString() + " #" + comment;
+                if (numArgs == 2)
+                    return opcode.ToString() + " " + arg1.ToString() + ", " + arg2.ToString() + " #" + comment;
+
+                return "ERROR";
             }
 
             public Instruction(string text)
@@ -63,101 +47,216 @@ namespace CompiladoresVM
                 int commentIdx = text.IndexOf("#");
                 if (commentIdx != -1)
                 {
-                    comment = text.Substring(commentIdx);
+                    comment = text.Substring(commentIdx + 1);
+                    hasComment = true;
                 }
                 else
                 {
                     comment = "";
+                    hasComment = false;
+                }
+
+                if (IsLabel(text, ref label))
+                {
+                    text = text.Substring(text.IndexOf(' ') + 1);
+                    s = text.Split(' ');
+                    isLabel = true;
+                }
+                else
+                {
+                    label = "";
+                    isLabel = false;
                 }
 
                 opcode = GetOpcode(s[0]);
                 numArgs = NumberOfArguments(opcode);
+                useLabel = UseLabel(opcode);
 
                 if (numArgs == 0)
                 {
-                    arg1 = UInt32.MaxValue;
-                    arg2 = UInt32.MaxValue;
+                    arg1 = "";
+                    arg2 = "";
                 }
                 else if (numArgs == 1)
                 {
-                    arg1 = UInt32.Parse(s[1]);
-                    arg2 = UInt32.MaxValue;
+                    arg1 = s[1];
+                    arg2 = "";
                 }
                 else if (numArgs == 2)
                 {
-                    arg1 = UInt32.Parse(s[1]);
-                    arg2 = UInt32.Parse(s[2]);
+                    if (hasComment)
+                    {
+                        int start = text.IndexOf(' ') + 1;
+                        text = text.Substring(start, text.IndexOf(' ', start) - start);
+                        s = text.Split(',');
+                    }
+                    else
+                    {
+                        text = text.Substring(text.IndexOf(' ') + 1);
+                        s = text.Split(',');
+                    }
+
+                    arg1 = s[0];
+                    arg2 = s[1];
                 }
             }
 
-            public InstructionOpcode GetOpcode(string m)
+            public string GetOpcode(string m)
             {
-                switch (m)
+                string tmp = m.IndexOf(' ') != -1 ? m.Substring(0, m.IndexOf(' ')) : m;
+                tmp = tmp.ToUpper();
+
+                switch (tmp)
                 {
-                    case "LDC": return InstructionOpcode.LDC;
-                    case "LDV": return InstructionOpcode.LDV;
-                    case "ADD": return InstructionOpcode.ADD;
-                    case "SUB": return InstructionOpcode.SUB;
-                    case "MULT": return InstructionOpcode.MULT;
-                    case "DIVI": return InstructionOpcode.DIVI;
-                    case "INV": return InstructionOpcode.INV;
-                    case "AND": return InstructionOpcode.AND;
-                    case "OR": return InstructionOpcode.OR;
-                    case "NEG": return InstructionOpcode.NEG;
-                    case "CME": return InstructionOpcode.CME;
-                    case "CMA": return InstructionOpcode.CMA;
-                    case "CEQ": return InstructionOpcode.CEQ;
-                    case "CDIF": return InstructionOpcode.CDIF;
-                    case "CMEQ": return InstructionOpcode.CMEQ;
-                    case "CMAQ": return InstructionOpcode.CMAQ;
-                    case "START": return InstructionOpcode.START;
-                    case "HLT": return InstructionOpcode.HLT;
-                    case "STR": return InstructionOpcode.STR;
-                    case "JMP": return InstructionOpcode.JMP;
-                    case "JMPF": return InstructionOpcode.JMPF;
-                    case "NULL": return InstructionOpcode.NULL;
-                    case "RD": return InstructionOpcode.RD;
-                    case "PRN": return InstructionOpcode.PRN;
-                    case "ALLOC": return InstructionOpcode.ALLOC;
-                    case "DALLOC": return InstructionOpcode.DALLOC;
-                    case "CALL": return InstructionOpcode.CALL;
-                    case "RETURN": return InstructionOpcode.RETURN;
+                    case "LDC": return  tmp;
+                    case "LDV": return  tmp;
+                    case "ADD": return  tmp;
+                    case "SUB": return  tmp;
+                    case "MULT": return tmp;
+                    case "DIVI": return tmp;
+                    case "INV": return  tmp;
+                    case "AND": return  tmp;
+                    case "OR": return   tmp;
+                    case "NEG": return  tmp;
+                    case "CME": return  tmp;
+                    case "CMA": return  tmp;
+                    case "CEQ": return  tmp;
+                    case "CDIF": return tmp;
+                    case "CMEQ": return tmp;
+                    case "CMAQ": return tmp;
+                    case "START": return tmp;
+                    case "HLT": return  tmp;
+                    case "STR": return  tmp;
+                    case "JMP": return  tmp;
+                    case "JMPF": return tmp;
+                    case "NULL": return tmp;
+                    case "RD": return   tmp;
+                    case "PRN": return  tmp;
+                    case "ALLOC": return tmp;
+                    case "DALLOC": return tmp;
+                    case "CALL": return tmp;
+                    case "RETURN": return tmp;
                 };
+
                 throw new Exception("Invalid opcode");
             }
 
-            public int NumberOfArguments(InstructionOpcode opcode)
+            public bool IsLabel(string m, ref string label)
+            {
+                switch (m)
+                {
+                    case "LDC": return false;
+                    case "LDV": return false;
+                    case "ADD": return false;
+                    case "SUB": return false;
+                    case "MULT": return false;
+                    case "DIVI": return false;
+                    case "INV": return false;
+                    case "AND": return false;
+                    case "OR": return false;
+                    case "NEG": return false;
+                    case "CME": return false;
+                    case "CMA": return false;
+                    case "CEQ": return false;
+                    case "CDIF": return false;
+                    case "CMEQ": return false;
+                    case "CMAQ": return false;
+                    case "START": return false;
+                    case "HLT": return false;
+                    case "STR": return false;
+                    case "JMP": return false;
+                    case "JMPF": return false;
+                    case "NULL": return false;
+                    case "RD": return false;
+                    case "PRN": return false;
+                    case "ALLOC": return false;
+                    case "DALLOC": return false;
+                    case "CALL": return false;
+                    case "RETURN": return false;
+                };
+
+                try
+                {
+                    int start = m.IndexOf(' ') + 1;
+                    var opcode = GetOpcode(m.Substring(start));
+
+                    label = m.Split(' ')[0];
+                    return true;
+                }
+                catch { }
+
+                return false;
+            }
+
+            public int NumberOfArguments(string opcode)
             {
                 switch (opcode)
                 {
-                    case InstructionOpcode.LDC: return 1;
-                    case InstructionOpcode.LDV: return 1;
-                    case InstructionOpcode.ADD: return 0;
-                    case InstructionOpcode.SUB: return 0;
-                    case InstructionOpcode.MULT: return 0;
-                    case InstructionOpcode.DIVI: return 0;
-                    case InstructionOpcode.INV: return 0;
-                    case InstructionOpcode.AND: return 0;
-                    case InstructionOpcode.OR: return 0;
-                    case InstructionOpcode.NEG: return 0;
-                    case InstructionOpcode.CME: return 0;
-                    case InstructionOpcode.CMA: return 0;
-                    case InstructionOpcode.CEQ: return 0;
-                    case InstructionOpcode.CDIF: return 0;
-                    case InstructionOpcode.CMEQ: return 0;
-                    case InstructionOpcode.CMAQ: return 0;
-                    case InstructionOpcode.START: return 0;
-                    case InstructionOpcode.HLT: return 0;
-                    case InstructionOpcode.STR: return 1;
-                    case InstructionOpcode.JMP: return 1;
-                    case InstructionOpcode.JMPF: return 1;
-                    case InstructionOpcode.NULL: return 0;
-                    case InstructionOpcode.RD: return 0;
-                    case InstructionOpcode.PRN: return 0;
-                    case InstructionOpcode.ALLOC: return 2;
-                    case InstructionOpcode.DALLOC: return 2;
-                    case InstructionOpcode.CALL: return 1;
-                    case InstructionOpcode.RETURN: return 0;
+                    case "LDC": return 1;
+                    case "LDV": return 1;
+                    case "ADD": return 0;
+                    case "SUB": return 0;
+                    case "MULT": return 0;
+                    case "DIVI": return 0;
+                    case "INV": return 0;
+                    case "AND": return 0;
+                    case "OR": return 0;
+                    case "NEG": return 0;
+                    case "CME": return 0;
+                    case "CMA": return 0;
+                    case "CEQ": return 0;
+                    case "CDIF": return 0;
+                    case "CMEQ": return 0;
+                    case "CMAQ": return 0;
+                    case "START": return 0;
+                    case "HLT": return 0;
+                    case "STR": return 1;
+                    case "JMP": return 1;
+                    case "JMPF": return 1;
+                    case "NULL": return 0;
+                    case "RD": return 0;
+                    case "PRN": return 0;
+                    case "ALLOC": return 2;
+                    case "DALLOC": return 2;
+                    case "CALL": return 1;
+                    case "RETURN": return 0;
+                };
+                
+                throw new Exception("Invalid opcode");
+            }
+
+            public bool UseLabel(string opcode)
+            {
+                switch (opcode)
+                {
+                    case "LDC": return false;
+                    case "LDV": return false;
+                    case "ADD": return false;
+                    case "SUB": return false;
+                    case "MULT": return false;
+                    case "DIVI": return false;
+                    case "INV": return false;
+                    case "AND": return false;
+                    case "OR": return false;
+                    case "NEG": return false;
+                    case "CME": return false;
+                    case "CMA": return false;
+                    case "CEQ": return false;
+                    case "CDIF": return false;
+                    case "CMEQ": return false;
+                    case "CMAQ": return false;
+                    case "START": return false;
+                    case "HLT": return false;
+                    case "STR": return false;
+                    case "JMP": return true;
+                    case "JMPF": return true;
+                    case "NULL": return false;
+                    case "RD": return false;
+                    case "PRN": return false;
+                    case "ALLOC": return false;
+                    case "DALLOC": return false;
+                    case "CALL": return true;
+                    case "RETURN": return false;
                 };
 
                 throw new Exception("Invalid opcode");
@@ -166,27 +265,28 @@ namespace CompiladoresVM
 
         public struct Registers
         {
-            public uint S; // stack index
-            public uint I; // instruction index
+            public int S; // stack index
+            public int I; // instruction index
         };
 
         public struct MemorySegments
         {
-            public Instruction[] M;
-            public UInt32[] S;
+            public Instruction[] Instructions;
+            public int maxInstructions;
+            public int[] M;
         };
 
         public class Breakpoint
         {
-            public uint I;
+            public int I;
 
-            public Breakpoint(uint I)
+            public Breakpoint(int I)
             {
                 this.I = I;
             }
         }
 
-        public class IO
+        public struct IO
         {
             public bool waiting;
             public int input;
@@ -197,26 +297,34 @@ namespace CompiladoresVM
         public MemorySegments memory;
         public IO io;
 
-        public List<Breakpoint> breakpoints;        
+        public List<Breakpoint> breakpoints;
+        public Dictionary<string, int> labelTable;
 
         public VMCore(uint maxInstructions, uint maxMemory)
         {
             registers.S = 0;
             registers.I = 0;
-            memory.M = new Instruction[maxInstructions];
-            memory.S = new UInt32[maxMemory];
+            memory.Instructions = new Instruction[maxInstructions];
+            memory.M = new int[maxMemory];
+            memory.maxInstructions = 0;
             breakpoints = new List<Breakpoint>();
+            labelTable = new Dictionary<string, int>();
             io.waiting = false;
         }
 
         public void ParseFromFile(string path)
         {
             string[] lines = File.ReadAllLines(path);
-            int i = 0;
+            memory.maxInstructions = 0;
             foreach (var l in lines)
             {
-                memory.M[i] = new Instruction(l);
-                i++;
+                memory.Instructions[memory.maxInstructions] = new Instruction(l);
+
+                if (memory.Instructions[memory.maxInstructions].isLabel)
+                {
+                    labelTable[memory.Instructions[memory.maxInstructions].label] = memory.maxInstructions;
+                }
+                memory.maxInstructions++;
             }
         }
 
@@ -235,9 +343,10 @@ namespace CompiladoresVM
         {
             bool continueExec = true;
 
-            if (registers.I < memory.M.Count())
+            if (registers.I < memory.Instructions.Count())
             {
-                var opcode = memory.M[registers.I].opcode;
+                var instruction = memory.Instructions[registers.I];
+                var opcode = instruction.opcode;
 
                 if (stopOnBreakPoint && breakpoints.IndexOf(new Breakpoint(registers.I)) != -1)
                 {
@@ -247,89 +356,108 @@ namespace CompiladoresVM
 
                 switch (opcode)
                 {
-                    case InstructionOpcode.LDC:
+                    case "LDC":
+                        registers.S += 1;
+                        memory.M[registers.S] = int.Parse(instruction.arg1);
                         registers.I++;
                         break;
-                    case InstructionOpcode.LDV:
+                    case "LDV":
+                        registers.S += 1;
+                        memory.M[registers.S] = memory.M[int.Parse(instruction.arg1)];
                         registers.I++;
                         break;
-                    case InstructionOpcode.ADD:
+                    case "ADD":
+                        memory.M[registers.S - 1] += memory.M[registers.S];
+                        registers.S -= 1;
                         registers.I++;
                         break;
-                    case InstructionOpcode.SUB:
+                    case "SUB":
+                        memory.M[registers.S - 1] -= memory.M[registers.S];
+                        registers.S -= 1;
                         registers.I++;
                         break;
-                    case InstructionOpcode.MULT:
+                    case "MULT":
+                        memory.M[registers.S - 1] *= memory.M[registers.S];
+                        registers.S -= 1;
                         registers.I++;
                         break;
-                    case InstructionOpcode.DIVI:
+                    case "DIVI":
+                        memory.M[registers.S - 1] /= memory.M[registers.S];
+                        registers.S -= 1;
                         registers.I++;
                         break;
-                    case InstructionOpcode.INV:
+                    case "INV":
+                        memory.M[registers.S] = -memory.M[registers.S];
                         registers.I++;
                         break;
-                    case InstructionOpcode.AND:
+                    case "AND":
                         registers.I++;
                         break;
-                    case InstructionOpcode.OR:
+                    case "OR":
                         registers.I++;
                         break;
-                    case InstructionOpcode.NEG:
+                    case "NEG":
+                        memory.M[registers.S] = 1 - memory.M[registers.S];
                         registers.I++;
                         break;
-                    case InstructionOpcode.CME:
+                    case "CME":
                         registers.I++;
                         break;
-                    case InstructionOpcode.CMA:
+                    case "CMA":
                         registers.I++;
                         break;
-                    case InstructionOpcode.CEQ:
+                    case "CEQ":
                         registers.I++;
                         break;
-                    case InstructionOpcode.CDIF:
+                    case "CDIF":
                         registers.I++;
                         break;
-                    case InstructionOpcode.CMEQ:
+                    case "CMEQ":
                         registers.I++;
                         break;
-                    case InstructionOpcode.CMAQ:
+                    case "CMAQ":
                         registers.I++;
                         break;
-                    case InstructionOpcode.START:
+                    case "START":
+                        registers.I = 0;
+                        registers.S = -1;
                         registers.I++;
                         break;
-                    case InstructionOpcode.HLT:
+                    case "HLT":
+                        continueExec = false;
+                        break;
+                    case "STR":
                         registers.I++;
                         break;
-                    case InstructionOpcode.STR:
+                    case "JMP":
+                        registers.I = labelTable[instruction.arg1];
+                        break;
+                    case "JMPF":
                         registers.I++;
                         break;
-                    case InstructionOpcode.JMP:
+                    case "NULL":
                         registers.I++;
                         break;
-                    case InstructionOpcode.JMPF:
+                    case "RD":
                         registers.I++;
                         break;
-                    case InstructionOpcode.NULL:
+                    case "PRN":
                         registers.I++;
                         break;
-                    case InstructionOpcode.RD:
+                    case "ALLOC":
                         registers.I++;
                         break;
-                    case InstructionOpcode.PRN:
+                    case "DALLOC":
                         registers.I++;
                         break;
-                    case InstructionOpcode.ALLOC:
-                        registers.I++;
+                    case "CALL":
+                        registers.S++;
+                        memory.M[registers.S] = registers.I + 1;
+                        registers.I = labelTable[instruction.arg1];
                         break;
-                    case InstructionOpcode.DALLOC:
-                        registers.I++;
-                        break;
-                    case InstructionOpcode.CALL:
-                        registers.I++;
-                        break;
-                    case InstructionOpcode.RETURN:
-                        registers.I++;
+                    case "RETURN":
+                        registers.I = memory.M[registers.S];
+                        registers.S--;
                         break;
                 };
             }
