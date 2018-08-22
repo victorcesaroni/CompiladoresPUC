@@ -349,7 +349,7 @@ namespace CompiladoresVM
         {
             bool continueExec = true;
 
-            if (io.waitingOutput || io.waitingInput)
+            if (io.waitingInput)
                 return false;
 
             if (I < instructionCount)
@@ -476,8 +476,7 @@ namespace CompiladoresVM
                         io.inputMemoryIndex = S;
                         I++;
                         break;
-                    case "PRN":                      
-                        continueExec = false;
+                    case "PRN":
                         io.waitingOutput = true;
                         io.outputMemoryIndex = S;
                         S--;

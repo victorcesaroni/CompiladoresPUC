@@ -28,6 +28,9 @@ namespace CompiladoresVM
 
                 vm.ParseFromFile(openFileDialog1.FileName);
 
+                txtInput.Text = "";
+                txtOutput.Text = "";
+
                 listViewMemoryProgram.Items.Clear();
                 for (int i = 0; i < vm.instructionCount; i++)
                 {
@@ -49,7 +52,7 @@ namespace CompiladoresVM
                     }
                 }
                 listViewMemoryProgram.Items.Add(new ListViewItem(new string[] { "FIM", "FIM", "FIM", "FIM", "FIM", "FIM", "FIM", }));
-
+                
                 ProccessIO();
             }
         }
@@ -128,7 +131,10 @@ namespace CompiladoresVM
             }
 
             txtInput.Enabled = vm.io.waitingInput;
-            txtOutput.Enabled = vm.io.waitingOutput;
+            txtOutput.Enabled = true;
+
+            txtOutput.Select(txtOutput.TextLength, txtOutput.TextLength);
+            txtOutput.ScrollToCaret();
         }
 
         private void continuarToolStripMenuItem_Click(object sender, EventArgs e)
