@@ -108,30 +108,30 @@ namespace CompiladoresVM
 
                 switch (tmp)
                 {
-                    case "LDC": return tmp;
-                    case "LDV": return tmp;
-                    case "ADD": return tmp;
-                    case "SUB": return tmp;
+                    case "LDC": return  tmp;
+                    case "LDV": return  tmp;
+                    case "ADD": return  tmp;
+                    case "SUB": return  tmp;
                     case "MULT": return tmp;
                     case "DIVI": return tmp;
-                    case "INV": return tmp;
-                    case "AND": return tmp;
-                    case "OR": return tmp;
-                    case "NEG": return tmp;
-                    case "CME": return tmp;
-                    case "CMA": return tmp;
-                    case "CEQ": return tmp;
+                    case "INV": return  tmp;
+                    case "AND": return  tmp;
+                    case "OR": return   tmp;
+                    case "NEG": return  tmp;
+                    case "CME": return  tmp;
+                    case "CMA": return  tmp;
+                    case "CEQ": return  tmp;
                     case "CDIF": return tmp;
                     case "CMEQ": return tmp;
                     case "CMAQ": return tmp;
                     case "START": return tmp;
-                    case "HLT": return tmp;
-                    case "STR": return tmp;
-                    case "JMP": return tmp;
+                    case "HLT": return  tmp;
+                    case "STR": return  tmp;
+                    case "JMP": return  tmp;
                     case "JMPF": return tmp;
                     case "NULL": return tmp;
-                    case "RD": return tmp;
-                    case "PRN": return tmp;
+                    case "RD": return   tmp;
+                    case "PRN": return  tmp;
                     case "ALLOC": return tmp;
                     case "DALLOC": return tmp;
                     case "CALL": return tmp;
@@ -221,7 +221,7 @@ namespace CompiladoresVM
                     case "CALL": return 1;
                     case "RETURN": return 0;
                 };
-
+                
                 throw new Exception("Invalid opcode");
             }
 
@@ -262,56 +262,66 @@ namespace CompiladoresVM
                 throw new Exception("Invalid opcode");
             }
         }
+        
+        public struct MemorySegments
+        {
+            public Instruction[] Instructions;
+            public int instructionCount;
+            public int[] M;
+        };
 
-        public Instruction[] instructions; // instructions memory
-        public int instructionCount; // number of instructions
-        public int[] M; // stack
+        public class Breakpoint
+        {
+            public int I;
+
+            public Breakpoint(int I)
+            {
+                this.I = I;
+            }
+        }
 
         public struct IO
         {
-            public bool waitingInput;
-            public bool waitingOutput;
-            public int inputMemoryIndex;
-            public int outputMemoryIndex;
+            public bool waiting;
+            public int input;
+            public int output;
         }
 
         // registers
         public int S; // stack index
         public int I; // instruction index
 
+        public MemorySegments memory;
         public IO io;
 
-        public List<int> breakpoints;
+        public List<Breakpoint> breakpoints;
         public Dictionary<string, int> labelTable;
 
         public VMCore(uint maxInstructions, uint maxMemory)
         {
             S = 0;
             I = 0;
-            instructions = new Instruction[maxInstructions];
-            M = new int[maxMemory];
-            instructionCount = 0;
-            breakpoints = new List<int>();
+            memory.Instructions = new Instruction[maxInstructions];
+            memory.M = new int[maxMemory];
+            memory.instructionCount = 0;
+            breakpoints = new List<Breakpoint>();
             labelTable = new Dictionary<string, int>();
-            io.waitingInput = false;
-            io.waitingOutput = false;
-            io.inputMemoryIndex = -1;
-            io.outputMemoryIndex = -1;
+            io.waiting = false;
         }
 
         public void ParseFromFile(string path)
         {
             string[] lines = File.ReadAllLines(path);
-            instructionCount = 0;
+            memory.instructionCount = 0;
             foreach (var l in lines)
             {
-                instructions[instructionCount] = new Instruction(l);
+                memory.Instructions[memory.instructionCount] = new Instruction(l);
 
-                if (instructions[instructionCount].isLabel)
+                if (memory.Instructions[memory.instructionCount].isLabel)
                 {
-                    labelTable[instructions[instructionCount].label] = instructionCount;
+                    labelTable[memory.Instructions[memory.instructionCount].label] = memory.instructionCount;
                 }
-                instructionCount++;
+                memory.instructionCount++;
             }
         }
 
@@ -326,38 +336,16 @@ namespace CompiladoresVM
             }
         }
 
-        public int IORead()
-        {
-            if (!io.waitingOutput)
-                throw new Exception("Invalid Read IO operation");
-
-            int ret = M[io.outputMemoryIndex];
-            io.waitingOutput = false;
-            return ret;
-        }
-
-        public void IOWrite(int data)
-        {
-            if (!io.waitingInput)
-                throw new Exception("Invalid Write IO operation");
-
-            M[io.inputMemoryIndex] = data;
-            io.waitingInput = false;
-        }
-
         public bool SingleStep(bool stopOnBreakPoint)
         {
             bool continueExec = true;
 
-            if (io.waitingOutput || io.waitingInput)
-                return false;
-
-            if (I < instructionCount)
+            if (I < memory.Instructions.Count())
             {
-                var instruction = instructions[I];
+                var instruction = memory.Instructions[I];
                 var opcode = instruction.opcode;
 
-                if (stopOnBreakPoint && breakpoints.IndexOf(I) != -1)
+                if (stopOnBreakPoint && breakpoints.IndexOf(new Breakpoint(I)) != -1)
                 {
                     continueExec = false;
                     return false;
@@ -367,80 +355,64 @@ namespace CompiladoresVM
                 {
                     case "LDC":
                         S += 1;
-                        M[S] = int.Parse(instruction.arg1);
+                        memory.M[S] = int.Parse(instruction.arg1);
                         I++;
                         break;
                     case "LDV":
                         S += 1;
-                        M[S] = M[int.Parse(instruction.arg1)];
+                        memory.M[S] = memory.M[int.Parse(instruction.arg1)];
                         I++;
                         break;
                     case "ADD":
-                        M[S - 1] += M[S];
+                        memory.M[S - 1] += memory.M[S];
                         S -= 1;
                         I++;
                         break;
                     case "SUB":
-                        M[S - 1] -= M[S];
+                        memory.M[S - 1] -= memory.M[S];
                         S -= 1;
                         I++;
                         break;
                     case "MULT":
-                        M[S - 1] *= M[S];
+                        memory.M[S - 1] *= memory.M[S];
                         S -= 1;
                         I++;
                         break;
                     case "DIVI":
-                        M[S - 1] /= M[S];
+                        memory.M[S - 1] /= memory.M[S];
                         S -= 1;
                         I++;
                         break;
                     case "INV":
-                        M[S] = -M[S];
+                        memory.M[S] = -memory.M[S];
                         I++;
                         break;
                     case "AND":
-                        M[S - 1] = (M[S - 1] == 1 && M[S] == 1) ? 1 : 0;
-                        S--;
                         I++;
                         break;
                     case "OR":
-                        M[S - 1] = (M[S - 1] == 1 || M[S] == 1) ? 1 : 0;
-                        S--;
                         I++;
                         break;
                     case "NEG":
-                        M[S] = 1 - M[S];
+                        memory.M[S] = 1 - memory.M[S];
                         I++;
                         break;
                     case "CME":
-                        M[S - 1] = (M[S - 1] < M[S]) ? 1 : 0;
-                        S--;
                         I++;
                         break;
                     case "CMA":
-                        M[S - 1] = (M[S - 1] > M[S]) ? 1 : 0;
-                        S--;
                         I++;
                         break;
                     case "CEQ":
-                        M[S - 1] = (M[S - 1] == M[S]) ? 1 : 0;
-                        S--;
                         I++;
                         break;
                     case "CDIF":
-                        M[S - 1] = (M[S - 1] != M[S]) ? 1 : 0;
-                        S--;
                         I++;
                         break;
                     case "CMEQ":
-                        M[S - 1] = (M[S - 1] <= M[S]) ? 1 : 0;
-                        S--;
                         I++;
                         break;
                     case "CMAQ":
-                        M[S - 1] = (M[S - 1] >= M[S]) ? 1 : 0;
-                        S--;
                         I++;
                         break;
                     case "START":
@@ -452,35 +424,21 @@ namespace CompiladoresVM
                         continueExec = false;
                         break;
                     case "STR":
-                        {
-                            int n = int.Parse(instruction.arg1);
-                            M[n] = M[S];
-                            S--;
-                        }
                         I++;
                         break;
                     case "JMP":
                         I = labelTable[instruction.arg1];
                         break;
                     case "JMPF":
-                        I = M[S] == 0 ? labelTable[instruction.arg1] : I + 1;
-                        S--;
+                        I = labelTable[instruction.arg1];
                         break;
                     case "NULL":
                         I++;
                         break;
                     case "RD":
-                        continueExec = false;
-                        S++;
-                        io.waitingInput = true;
-                        io.inputMemoryIndex = S;
                         I++;
                         break;
-                    case "PRN":                      
-                        continueExec = false;
-                        io.waitingOutput = true;
-                        io.outputMemoryIndex = S;
-                        S--;
+                    case "PRN":
                         I++;
                         break;
                     case "ALLOC":
@@ -490,7 +448,7 @@ namespace CompiladoresVM
                             for (int k = 0; k < n; k++)
                             {
                                 S++;
-                                M[S] = M[m + k];
+                                memory.M[S] = memory.M[m + k];
                             }
                         }
                         I++;
@@ -502,18 +460,18 @@ namespace CompiladoresVM
                             for (int k = n - 1; k >= 0; k--)
                             {
                                 S--;
-                                M[m + k] = M[S];
+                                memory.M[m + k] = memory.M[S];
                             }
                         }
                         I++;
                         break;
                     case "CALL":
                         S++;
-                        M[S] = I + 1;
+                        memory.M[S] = I + 1;
                         I = labelTable[instruction.arg1];
                         break;
                     case "RETURN":
-                        I = M[S];
+                        I = memory.M[S];
                         S--;
                         break;
                 };
