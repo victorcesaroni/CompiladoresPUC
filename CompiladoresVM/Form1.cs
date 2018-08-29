@@ -14,6 +14,7 @@ namespace CompiladoresVM
     public partial class Form1 : Form
     {
         VMCore vm;
+        bool stepByStep = false;
 
         public Form1()
         {
@@ -24,7 +25,7 @@ namespace CompiladoresVM
         {
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
-                vm = new VMCore(2000, 200);
+                vm = new VMCore(2000, 2000);
 
                 vm.ParseFromFile(openFileDialog1.FileName);
 
@@ -51,8 +52,7 @@ namespace CompiladoresVM
                         listViewMemoryProgram.Items[i].ForeColor = Color.DarkGray;
                     }
                 }
-                listViewMemoryProgram.Items.Add(new ListViewItem(new string[] { "FIM", "FIM", "FIM", "FIM", "FIM", "FIM", "FIM", }));
-                
+
                 ProccessIO();
             }
         }
@@ -63,7 +63,8 @@ namespace CompiladoresVM
             {
                 foreach (ListViewItem item in listViewMemoryProgram.SelectedItems)
                 {
-                    item.BackColor = Color.Red;
+                    vm.breakpoints.Add(listViewMemoryProgram.Items.IndexOf(item));
+                    item.BackColor = Color.LightSalmon;
                 }
             }
         }
@@ -74,6 +75,9 @@ namespace CompiladoresVM
             {
                 foreach (ListViewItem item in listViewMemoryProgram.SelectedItems)
                 {
+                    int idx = vm.breakpoints.IndexOf(listViewMemoryProgram.Items.IndexOf(item));
+                    if (idx != -1)
+                        vm.breakpoints.RemoveAt(idx);
                     item.BackColor = Color.White;
                 }
             }
@@ -87,24 +91,31 @@ namespace CompiladoresVM
                 var m = vm.M[i];
                 listViewMemoryData.Items.Add(new ListViewItem(new string[] { i.ToString(), m.ToString(), }));
             }
-            listViewMemoryData.Items.Add(new ListViewItem(new string[] { "FIM", "FIM", }));
 
             labelI.Text = "I: " + vm.I.ToString();
             labelS.Text = "S: " + vm.S.ToString();
 
             listViewMemoryProgram.SelectedItems.Clear();
-            listViewMemoryProgram.Items[vm.I].Selected = true;
+            listViewMemoryProgram.Items[vm.I - 1].Selected = true;
             //listViewMemoryProgram.Items[vm.I].BackColor = Color.Green;
-            listViewMemoryProgram.EnsureVisible(vm.I);
-            listViewMemoryProgram.Select();
+            listViewMemoryProgram.EnsureVisible(vm.I - 1);
 
             if (vm.S >= 0)
             {
                 //listViewMemoryData.SelectedItems.Clear();
                 //listViewMemoryData.Items[vm.S].Selected = true;
-                listViewMemoryData.Items[vm.S].BackColor = Color.Green;
+                listViewMemoryData.Items[vm.S].BackColor = Color.LightBlue;
                 //listViewMemoryData.EnsureVisible(vm.S);
                 //listViewMemoryData.Select();
+            }
+
+            foreach (ListViewItem item in listViewMemoryProgram.Items)
+            {
+                item.BackColor = Color.White;
+            }
+            foreach (int I in vm.breakpoints)
+            {
+                listViewMemoryProgram.Items[I].BackColor = Color.LightSalmon;
             }
         }
 
@@ -112,6 +123,13 @@ namespace CompiladoresVM
         {
             txtInput.Enabled = vm.io.waitingInput;
             txtOutput.Enabled = vm.io.waitingOutput;
+            groupBoxInput.BackColor = vm.io.waitingInput ? Color.LightGreen : Color.LightSalmon;
+
+            if (txtInput.Enabled)
+            {
+                txtInput.Focus();
+                txtInput.Select(0, 0);
+            }
 
             int parseResult = 0;
 
@@ -132,36 +150,72 @@ namespace CompiladoresVM
 
             txtInput.Enabled = vm.io.waitingInput;
             txtOutput.Enabled = true;
+            groupBoxInput.BackColor = vm.io.waitingInput ? Color.LightGreen : Color.LightSalmon;
 
             txtOutput.Select(txtOutput.TextLength, txtOutput.TextLength);
             txtOutput.ScrollToCaret();
+
+            if (!txtInput.Enabled)
+                listViewMemoryProgram.Select();
+        }
+
+        bool VMCycle()
+        {
+            ProccessIO();
+            bool continueExec = vm.SingleStep();
+            ProccessIO();
+
+            return continueExec;
+        }
+
+        void StepByStepExec()
+        {
+            stepByStep = true;
+            VMCycle();
+            UpdateInterface();
+        }
+
+        void FullRun()
+        {
+            stepByStep = false;
+            while (VMCycle()) ;
+            UpdateInterface();
         }
 
         private void continuarToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            ProccessIO();
-            vm.Run(true, true);
-            ProccessIO();
-            UpdateInterface();
+            StepByStepExec();
         }
 
         private void executarToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            //vm.Run(false, false);
+            FullRun();
+        }
 
-            while (true)
+        private void listViewMemoryProgram_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
             {
-                //txtOutput.Text += vm.memory.M[vm.registers.I].ToString() + "\r\n";                
+                if (stepByStep)
+                    StepByStepExec();
+                else
+                    FullRun();
 
-                ProccessIO();
-                bool continueExec = vm.SingleStep(false);
-                ProccessIO();
-
-                if (!continueExec)
-                    break;
+                e.SuppressKeyPress = true;
             }
+        }
 
-            UpdateInterface();
+        private void txtInput_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                if (stepByStep)
+                    StepByStepExec();
+                else
+                    FullRun();
+
+                e.SuppressKeyPress = true;
+            }
         }
     }
 }

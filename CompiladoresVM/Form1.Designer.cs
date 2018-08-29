@@ -38,19 +38,16 @@
             this.continuarToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.listViewMemoryProgram = new System.Windows.Forms.ListView();
             this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.labelHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader8 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader9 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader11 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader10 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.contextMenuStripBreakpoint = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.adicionarBreakpointToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.removerBreakpointToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
-            this.listViewBreakpoints = new System.Windows.Forms.ListView();
-            this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader5 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.contextMenuStripBreakpointsList = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.ativardesativarBreakpointToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.removerBreakpointToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.groupBoxInput = new System.Windows.Forms.GroupBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.txtOutput = new System.Windows.Forms.RichTextBox();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
@@ -59,19 +56,12 @@
             this.columnHeader6 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader7 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
-            this.labelHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader8 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader9 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader10 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader11 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.labelI = new System.Windows.Forms.ToolStripStatusLabel();
             this.labelS = new System.Windows.Forms.ToolStripStatusLabel();
             this.menuStrip1.SuspendLayout();
             this.contextMenuStripBreakpoint.SuspendLayout();
-            this.contextMenuStripBreakpointsList.SuspendLayout();
-            this.groupBox1.SuspendLayout();
-            this.groupBox2.SuspendLayout();
+            this.groupBoxInput.SuspendLayout();
             this.groupBox3.SuspendLayout();
             this.groupBox4.SuspendLayout();
             this.groupBox5.SuspendLayout();
@@ -83,9 +73,10 @@
             this.txtInput.Dock = System.Windows.Forms.DockStyle.Fill;
             this.txtInput.Location = new System.Drawing.Point(3, 16);
             this.txtInput.Name = "txtInput";
-            this.txtInput.Size = new System.Drawing.Size(194, 58);
+            this.txtInput.Size = new System.Drawing.Size(194, 101);
             this.txtInput.TabIndex = 2;
             this.txtInput.Text = "";
+            this.txtInput.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtInput_KeyDown);
             // 
             // menuStrip1
             // 
@@ -150,19 +141,45 @@
             this.listViewMemoryProgram.FullRowSelect = true;
             this.listViewMemoryProgram.Location = new System.Drawing.Point(3, 16);
             this.listViewMemoryProgram.Name = "listViewMemoryProgram";
-            this.listViewMemoryProgram.Size = new System.Drawing.Size(560, 113);
+            this.listViewMemoryProgram.Size = new System.Drawing.Size(560, 207);
             this.listViewMemoryProgram.TabIndex = 5;
             this.listViewMemoryProgram.UseCompatibleStateImageBehavior = false;
             this.listViewMemoryProgram.View = System.Windows.Forms.View.Details;
+            this.listViewMemoryProgram.KeyDown += new System.Windows.Forms.KeyEventHandler(this.listViewMemoryProgram_KeyDown);
             // 
             // columnHeader1
             // 
             this.columnHeader1.Text = "i";
             this.columnHeader1.Width = 25;
             // 
+            // labelHeader
+            // 
+            this.labelHeader.Text = "Label";
+            this.labelHeader.Width = 40;
+            // 
             // columnHeader2
             // 
             this.columnHeader2.Text = "Instrução";
+            // 
+            // columnHeader8
+            // 
+            this.columnHeader8.Text = "arg1";
+            this.columnHeader8.Width = 35;
+            // 
+            // columnHeader9
+            // 
+            this.columnHeader9.Text = "arg2";
+            this.columnHeader9.Width = 35;
+            // 
+            // columnHeader11
+            // 
+            this.columnHeader11.Text = "Comentário";
+            this.columnHeader11.Width = 150;
+            // 
+            // columnHeader10
+            // 
+            this.columnHeader10.Text = "useLabel";
+            this.columnHeader10.Width = 40;
             // 
             // contextMenuStripBreakpoint
             // 
@@ -186,87 +203,25 @@
             this.removerBreakpointToolStripMenuItem1.Text = "Remover breakpoint";
             this.removerBreakpointToolStripMenuItem1.Click += new System.EventHandler(this.removerBreakpointToolStripMenuItem1_Click);
             // 
-            // listViewBreakpoints
+            // groupBoxInput
             // 
-            this.listViewBreakpoints.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.columnHeader3,
-            this.columnHeader4,
-            this.columnHeader5});
-            this.listViewBreakpoints.ContextMenuStrip = this.contextMenuStripBreakpointsList;
-            this.listViewBreakpoints.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.listViewBreakpoints.FullRowSelect = true;
-            this.listViewBreakpoints.Location = new System.Drawing.Point(3, 16);
-            this.listViewBreakpoints.Name = "listViewBreakpoints";
-            this.listViewBreakpoints.Size = new System.Drawing.Size(560, 112);
-            this.listViewBreakpoints.TabIndex = 6;
-            this.listViewBreakpoints.UseCompatibleStateImageBehavior = false;
-            this.listViewBreakpoints.View = System.Windows.Forms.View.Details;
-            // 
-            // columnHeader3
-            // 
-            this.columnHeader3.Text = "i";
-            this.columnHeader3.Width = 18;
-            // 
-            // columnHeader4
-            // 
-            this.columnHeader4.Text = "Instrução";
-            this.columnHeader4.Width = 178;
-            // 
-            // columnHeader5
-            // 
-            this.columnHeader5.Text = "Ativado";
-            // 
-            // contextMenuStripBreakpointsList
-            // 
-            this.contextMenuStripBreakpointsList.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.ativardesativarBreakpointToolStripMenuItem,
-            this.removerBreakpointToolStripMenuItem});
-            this.contextMenuStripBreakpointsList.Name = "contextMenuStripBreakpointsList";
-            this.contextMenuStripBreakpointsList.Size = new System.Drawing.Size(207, 48);
-            // 
-            // ativardesativarBreakpointToolStripMenuItem
-            // 
-            this.ativardesativarBreakpointToolStripMenuItem.Name = "ativardesativarBreakpointToolStripMenuItem";
-            this.ativardesativarBreakpointToolStripMenuItem.Size = new System.Drawing.Size(206, 22);
-            this.ativardesativarBreakpointToolStripMenuItem.Text = "Ativar/desativar breakpoint";
-            // 
-            // removerBreakpointToolStripMenuItem
-            // 
-            this.removerBreakpointToolStripMenuItem.Name = "removerBreakpointToolStripMenuItem";
-            this.removerBreakpointToolStripMenuItem.Size = new System.Drawing.Size(206, 22);
-            this.removerBreakpointToolStripMenuItem.Text = "Remover breakpoint";
-            // 
-            // groupBox1
-            // 
-            this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.groupBox1.Controls.Add(this.listViewBreakpoints);
-            this.groupBox1.Location = new System.Drawing.Point(12, 165);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(566, 131);
-            this.groupBox1.TabIndex = 9;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Breakpoints";
-            // 
-            // groupBox2
-            // 
-            this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.groupBox2.Controls.Add(this.txtInput);
-            this.groupBox2.Location = new System.Drawing.Point(12, 302);
-            this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(200, 77);
-            this.groupBox2.TabIndex = 10;
-            this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "Input";
+            this.groupBoxInput.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.groupBoxInput.Controls.Add(this.txtInput);
+            this.groupBoxInput.Location = new System.Drawing.Point(12, 259);
+            this.groupBoxInput.Name = "groupBoxInput";
+            this.groupBoxInput.Size = new System.Drawing.Size(200, 120);
+            this.groupBoxInput.TabIndex = 10;
+            this.groupBoxInput.TabStop = false;
+            this.groupBoxInput.Text = "Input";
             // 
             // groupBox3
             // 
             this.groupBox3.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox3.Controls.Add(this.txtOutput);
-            this.groupBox3.Location = new System.Drawing.Point(215, 302);
+            this.groupBox3.Location = new System.Drawing.Point(215, 259);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(360, 77);
+            this.groupBox3.Size = new System.Drawing.Size(360, 120);
             this.groupBox3.TabIndex = 11;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Output";
@@ -276,7 +231,7 @@
             this.txtOutput.Dock = System.Windows.Forms.DockStyle.Fill;
             this.txtOutput.Location = new System.Drawing.Point(3, 16);
             this.txtOutput.Name = "txtOutput";
-            this.txtOutput.Size = new System.Drawing.Size(354, 58);
+            this.txtOutput.Size = new System.Drawing.Size(354, 101);
             this.txtOutput.TabIndex = 2;
             this.txtOutput.Text = "";
             // 
@@ -288,7 +243,7 @@
             this.groupBox4.Controls.Add(this.listViewMemoryProgram);
             this.groupBox4.Location = new System.Drawing.Point(12, 27);
             this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Size = new System.Drawing.Size(566, 132);
+            this.groupBox4.Size = new System.Drawing.Size(566, 226);
             this.groupBox4.TabIndex = 12;
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Memória de programa";
@@ -333,31 +288,6 @@
             // 
             this.openFileDialog1.FileName = "openFileDialog1";
             // 
-            // labelHeader
-            // 
-            this.labelHeader.Text = "Label";
-            this.labelHeader.Width = 40;
-            // 
-            // columnHeader8
-            // 
-            this.columnHeader8.Text = "arg1";
-            this.columnHeader8.Width = 35;
-            // 
-            // columnHeader9
-            // 
-            this.columnHeader9.Text = "arg2";
-            this.columnHeader9.Width = 35;
-            // 
-            // columnHeader10
-            // 
-            this.columnHeader10.Text = "useLabel";
-            this.columnHeader10.Width = 40;
-            // 
-            // columnHeader11
-            // 
-            this.columnHeader11.Text = "Comentário";
-            this.columnHeader11.Width = 150;
-            // 
             // statusStrip1
             // 
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -390,8 +320,7 @@
             this.Controls.Add(this.groupBox5);
             this.Controls.Add(this.groupBox4);
             this.Controls.Add(this.groupBox3);
-            this.Controls.Add(this.groupBox2);
-            this.Controls.Add(this.groupBox1);
+            this.Controls.Add(this.groupBoxInput);
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "Form1";
@@ -400,9 +329,7 @@
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.contextMenuStripBreakpoint.ResumeLayout(false);
-            this.contextMenuStripBreakpointsList.ResumeLayout(false);
-            this.groupBox1.ResumeLayout(false);
-            this.groupBox2.ResumeLayout(false);
+            this.groupBoxInput.ResumeLayout(false);
             this.groupBox3.ResumeLayout(false);
             this.groupBox4.ResumeLayout(false);
             this.groupBox5.ResumeLayout(false);
@@ -423,18 +350,10 @@
         private System.Windows.Forms.ListView listViewMemoryProgram;
         private System.Windows.Forms.ColumnHeader columnHeader1;
         private System.Windows.Forms.ColumnHeader columnHeader2;
-        private System.Windows.Forms.ListView listViewBreakpoints;
-        private System.Windows.Forms.ColumnHeader columnHeader3;
-        private System.Windows.Forms.ColumnHeader columnHeader4;
-        private System.Windows.Forms.ColumnHeader columnHeader5;
         private System.Windows.Forms.ContextMenuStrip contextMenuStripBreakpoint;
         private System.Windows.Forms.ToolStripMenuItem adicionarBreakpointToolStripMenuItem;
-        private System.Windows.Forms.ContextMenuStrip contextMenuStripBreakpointsList;
-        private System.Windows.Forms.ToolStripMenuItem ativardesativarBreakpointToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem removerBreakpointToolStripMenuItem;
-        private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.ToolStripMenuItem continuarToolStripMenuItem;
-        private System.Windows.Forms.GroupBox groupBox2;
+        private System.Windows.Forms.GroupBox groupBoxInput;
         private System.Windows.Forms.GroupBox groupBox3;
         private System.Windows.Forms.RichTextBox txtOutput;
         private System.Windows.Forms.GroupBox groupBox4;

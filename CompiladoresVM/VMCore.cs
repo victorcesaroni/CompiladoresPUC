@@ -284,6 +284,8 @@ namespace CompiladoresVM
         public List<int> breakpoints;
         public Dictionary<string, int> labelTable;
 
+        public bool lastBreakWasBreakpoint = false;
+
         public VMCore(uint maxInstructions, uint maxMemory)
         {
             S = 0;
@@ -315,12 +317,11 @@ namespace CompiladoresVM
             }
         }
 
-        public void Run(bool singleStep, bool stopOnBreakPoint)
+        public void Run(bool singleStep)
         {
             while (true)
             {
-                bool continueExec = SingleStep(stopOnBreakPoint);
-
+                bool continueExec = SingleStep();
                 if (!continueExec || singleStep)
                     break;
             }
@@ -345,7 +346,7 @@ namespace CompiladoresVM
             io.waitingInput = false;
         }
 
-        public bool SingleStep(bool stopOnBreakPoint)
+        public bool SingleStep()
         {
             bool continueExec = true;
 
@@ -357,10 +358,15 @@ namespace CompiladoresVM
                 var instruction = instructions[I];
                 var opcode = instruction.opcode;
 
-                if (stopOnBreakPoint && breakpoints.IndexOf(I) != -1)
+                int bpIdx = breakpoints.IndexOf(I);
+                if (bpIdx != -1 && !lastBreakWasBreakpoint)
                 {
-                    continueExec = false;
+                    lastBreakWasBreakpoint = true;
                     return false;
+                }
+                else
+                {
+                    lastBreakWasBreakpoint = false;
                 }
 
                 switch (opcode)
