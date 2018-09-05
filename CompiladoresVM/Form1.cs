@@ -12,7 +12,7 @@ using System.Windows.Forms;
 namespace CompiladoresVM
 {
     public partial class Form1 : Form
-    {
+    {       
         VMCore vm;
         bool stepByStep = false;
 
