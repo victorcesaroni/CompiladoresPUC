@@ -106,6 +106,7 @@ namespace AnalisadorLexical
         };
 
         public StreamReader arquivo;
+        int linha, coluna;
         public List<Token> tokens;
 
         public AnalisadorLexical(string caminhoArquivo)
@@ -140,38 +141,90 @@ namespace AnalisadorLexical
 
         public Token PegaToken(char c)
         {
-            if (verificaDigito(c))
-                TrataDigito(c);
-            else if (verificaLetra(c))
-                TrataIdentificadorPalavraReservada(c);
-
-            throw new Exception("Deu algo errado");
+            if (VerificaDigito(c))
+                return TrataDigito(c);
+            else if (VerificaLetra(c))
+                return TrataIdentificadorPalavraReservada(c);
+            else if (VerificaAtribuicao(c))
+                return TrataAtribuicao(c);
+            else if (VerificaOperadorAritmetico(c))
+                return TrataOperadorAritimetico(c);
+            else if (VerificaOperadorRelacional(c))
+                return TrataOperadorRelacional(c);
+            else if (VerificaPontuacao(c))
+                return TrataPontuacao(c);
+            
+            throw new Exception(String.Format("Erro léxico L:{0} C:{1}", linha, coluna));
         }
-
-
-        public void TrataIdentificadorPalavraReservada(char c)
+        public Token TrataPontuacao(char c)
         {
-
+            throw new Exception("NAO IMPLEMENTADO");
         }
 
-        public void TrataDigito(char c)
+        public Token TrataOperadorRelacional(char c)
         {
-
+            throw new Exception("NAO IMPLEMENTADO");
         }
 
-        public bool verificaDigito(char c)
+        public Token TrataOperadorAritimetico(char c)
+        {
+            throw new Exception("NAO IMPLEMENTADO");
+        }
+
+        public Token TrataAtribuicao(char c)
+        {
+            throw new Exception("NAO IMPLEMENTADO");
+        }
+
+        public Token TrataIdentificadorPalavraReservada(char c)
+        {
+            throw new Exception("NAO IMPLEMENTADO");
+        }
+
+        public Token TrataDigito(char c)
+        {
+            throw new Exception("NAO IMPLEMENTADO");
+        }
+
+        public bool VerificaAtribuicao(char c)
+        {
+            return c == ':';
+        }
+
+        public bool VerificaPontuacao(char c)
+        {
+            return c == ';' || c == ',' || c == '(' || c == ')' || c == '.';
+        }
+
+        public bool VerificaOperadorRelacional(char c)
+        {
+            return c == '>' || c == '<' || c == '=';
+        }
+
+        public bool VerificaOperadorAritmetico(char c)
+        {
+            return c == '+' || c == '-' || c == '*';
+        }
+
+        public bool VerificaDigito(char c)
         {
             return c >= '0' && c <= '9';
         }
 
-        public bool verificaLetra(char c)
+        public bool VerificaLetra(char c)
         {
             return c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z';
         }
 
         private char Ler()
         {
-            return (char)arquivo.Read();
+            char c = (char)arquivo.Read();
+
+            coluna++;
+            if (c == '\n')
+                linha++;
+
+            return c;
         }
 
         private bool FimDeArquivo()
