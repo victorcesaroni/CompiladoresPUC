@@ -113,6 +113,9 @@ namespace AnalisadorLexical
         {
             arquivo = new StreamReader(new FileStream(caminhoArquivo, FileMode.Open));
 
+            linha = 0;
+            coluna = 0;
+
             char c = Ler();
 
             while (!FimDeArquivo())
