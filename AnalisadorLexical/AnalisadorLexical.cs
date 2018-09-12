@@ -222,7 +222,10 @@ namespace AnalisadorLexical
 
             coluna++;
             if (c == '\n')
+            {
+                coluna = 0;
                 linha++;
+            }
 
             return c;
         }
