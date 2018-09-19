@@ -49,9 +49,22 @@ namespace AnalisadorLexical
 
     class Token
     {
-        Simbolo simbolo;
-        string lexema;
-        ulong linha, coluna;
+        public Token()
+        {
+
+        }
+
+        public Token(Simbolo simbolo, string lexema, ulong linha, ulong coluna)
+        {
+            this.linha = linha;
+            this.coluna = coluna;
+            this.lexema = lexema;
+            this.simbolo = simbolo;
+        }
+
+        public Simbolo simbolo;
+        public string lexema;
+        public ulong linha, coluna;
     }
 
     class ExceptionErroLexical : Exception
@@ -106,8 +119,9 @@ namespace AnalisadorLexical
         };
 
         public StreamReader arquivo;
-        int linha, coluna;
-        public List<Token> tokens;
+        ulong linha, coluna;
+        public List<Token> tokens = new List<Token>();
+        char c;
 
         public AnalisadorLexical(string caminhoArquivo)
         {
@@ -116,77 +130,178 @@ namespace AnalisadorLexical
             linha = 0;
             coluna = 0;
 
-            char c = Ler();
+            c = Ler();
 
             while (!FimDeArquivo())
             {
-                switch (c)
+                while ((c == '{' || VerificaEspaco(c)) && !FimDeArquivo())
                 {
-                    case ' ': c = Ler(); break;
-                    case '\r': c = Ler(); break;
-                    case '\n': c = Ler(); break;
-                    case '\t': c = Ler(); break;
-                    case '{':
-                        c = Ler();
+                    if (c == '{')
+                    {
                         while (c != '}' && !FimDeArquivo())
+                        {
                             c = Ler();
-                        if (c != '}' || FimDeArquivo())
-                            throw new Exception("nao achou fecha chave");
-                        break;
+                        }
+                        c = Ler();
+                    }
+
+                    while (VerificaEspaco(c) && !FimDeArquivo())
+                    {
+                        c = Ler();
+                    }
                 }
 
                 if (!FimDeArquivo())
                 {
-                    tokens.Add(PegaToken(c));
+                    tokens.Add(PegaToken());
                 }
             }
+
+            arquivo.Close();
         }
 
-        public Token PegaToken(char c)
+        public Token PegaToken()
         {
             if (VerificaDigito(c))
-                return TrataDigito(c);
+                return TrataDigito();
             else if (VerificaLetra(c))
-                return TrataIdentificadorPalavraReservada(c);
+                return TrataIdentificadorPalavraReservada();
             else if (VerificaAtribuicao(c))
-                return TrataAtribuicao(c);
+                return TrataAtribuicao();
             else if (VerificaOperadorAritmetico(c))
-                return TrataOperadorAritimetico(c);
+                return TrataOperadorAritimetico();
             else if (VerificaOperadorRelacional(c))
-                return TrataOperadorRelacional(c);
+                return TrataOperadorRelacional();
             else if (VerificaPontuacao(c))
-                return TrataPontuacao(c);
-            
+                return TrataPontuacao();
+
             throw new Exception(String.Format("Erro léxico L:{0} C:{1}", linha, coluna));
         }
-        public Token TrataPontuacao(char c)
+        public Token TrataPontuacao()
         {
-            throw new Exception("NAO IMPLEMENTADO");
+            Token token = new Token(mapaDeSimbolo[c.ToString()], c.ToString(), linha, coluna);
+            c = Ler();
+            return token;
         }
 
-        public Token TrataOperadorRelacional(char c)
+        public Token TrataOperadorRelacional()
         {
-            throw new Exception("NAO IMPLEMENTADO");
+            Token token = new Token();
+            token.linha = linha;
+            token.coluna = coluna;
+            token.lexema = c.ToString();
+
+            if (c == '>')
+            {
+                c = Ler();
+                if (c == '=')
+                {
+                    token.lexema += c.ToString();
+                    token.simbolo = Simbolo.S_MAIOR_IG;
+                    c = Ler();
+                }
+                else
+                {
+                    token.simbolo = Simbolo.S_MAIOR;
+                }
+            }
+            else if (c == '<')
+            {
+                c = Ler();
+                if (c == '=')
+                {
+                    token.lexema += c.ToString();
+                    token.simbolo = Simbolo.S_MENOR_IG;
+                    c = Ler();
+                }
+                else
+                {
+                    token.simbolo = Simbolo.S_MENOR;
+                }
+            }
+            else if (c == '!')
+            {
+                c = Ler();
+                if (c == '=')
+                {
+                    token.lexema += c.ToString();
+                    token.simbolo = Simbolo.S_DIF;
+                    c = Ler();
+                }
+                else
+                {
+                    throw new Exception(String.Format("Erro léxico L:{0} C:{1}", linha, coluna));
+                }
+            }
+            else if (c == '=')
+            {
+                token.lexema += c.ToString();
+                token.simbolo = Simbolo.S_IG;
+                c = Ler();
+            }
+
+            return token;
         }
 
-        public Token TrataOperadorAritimetico(char c)
+        public Token TrataOperadorAritimetico()
         {
-            throw new Exception("NAO IMPLEMENTADO");
+            Token token = new Token(mapaDeSimbolo[c.ToString()], c.ToString(), linha, coluna);
+            c = Ler();
+            return token;
         }
 
-        public Token TrataAtribuicao(char c)
+        public Token TrataAtribuicao()
         {
-            throw new Exception("NAO IMPLEMENTADO");
+            string atrib = c.ToString();
+
+            c = Ler();
+
+            if (c == '=')
+            {
+                atrib += c.ToString();
+                c = Ler();
+
+                return new Token(Simbolo.S_ATRIBUICAO, atrib, linha, coluna);
+            }
+
+            return new Token(Simbolo.S_DOIS_PONTOS, atrib, linha, coluna);
         }
 
-        public Token TrataIdentificadorPalavraReservada(char c)
+        public Token TrataIdentificadorPalavraReservada()
         {
-            throw new Exception("NAO IMPLEMENTADO");
+            string id = c.ToString();
+
+            c = Ler();
+
+            while (VerificaLetra(c) || VerificaDigito(c) || c == '_')
+            {
+                id += c.ToString();
+                c = Ler();
+            }
+
+            Simbolo s = Simbolo.S_IDENTIFICADOR;
+
+            try
+            {
+                s = mapaDeSimbolo[id];
+            }
+            catch { }
+
+            return new Token(s, id, linha, coluna);
         }
 
-        public Token TrataDigito(char c)
+        public Token TrataDigito()
         {
-            throw new Exception("NAO IMPLEMENTADO");
+            string num = c.ToString();
+            c = Ler();
+
+            while (VerificaDigito(c))
+            {
+                num += c.ToString();
+                c = Ler();
+            }
+
+            return new Token(Simbolo.S_NUMERO, num, linha, coluna); ;
         }
 
         public bool VerificaAtribuicao(char c)
@@ -201,7 +316,7 @@ namespace AnalisadorLexical
 
         public bool VerificaOperadorRelacional(char c)
         {
-            return c == '>' || c == '<' || c == '=';
+            return c == '>' || c == '<' || c == '!' ||  c == '=';
         }
 
         public bool VerificaOperadorAritmetico(char c)
@@ -217,6 +332,18 @@ namespace AnalisadorLexical
         public bool VerificaLetra(char c)
         {
             return c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z';
+        }
+
+        public bool VerificaEspaco(char c)
+        {
+            switch (c)
+            {
+                case ' ': return true;
+                case '\r': return true;
+                case '\n': return true;
+                case '\t': return true;
+            }
+            return false;
         }
 
         private char Ler()
