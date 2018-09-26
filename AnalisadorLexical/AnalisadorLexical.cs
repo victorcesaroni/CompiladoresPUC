@@ -138,10 +138,16 @@ namespace AnalisadorLexical
                 {
                     if (c == '{')
                     {
-                        while (c != '}' && !FimDeArquivo())
+                        while (c != '}')
                         {
                             c = Ler();
+
+                            if (FimDeArquivo() && c != '}')
+                            {
+                                throw new Exception(String.Format("Erro léxico L:{0} C:{1}", linha, coluna));
+                            }
                         }
+
                         c = Ler();
                     }
 
