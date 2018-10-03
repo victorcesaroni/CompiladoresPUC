@@ -1,0 +1,11 @@
+C:\Users\15593866\Documents\compiladores2018\AnalisadorLexical\bin\Debug\netcoreapp2.0\Compilador.deps.json
+C:\Users\15593866\Documents\compiladores2018\AnalisadorLexical\bin\Debug\netcoreapp2.0\Compilador.runtimeconfig.json
+C:\Users\15593866\Documents\compiladores2018\AnalisadorLexical\bin\Debug\netcoreapp2.0\Compilador.runtimeconfig.dev.json
+C:\Users\15593866\Documents\compiladores2018\AnalisadorLexical\bin\Debug\netcoreapp2.0\Compilador.dll
+C:\Users\15593866\Documents\compiladores2018\AnalisadorLexical\bin\Debug\netcoreapp2.0\Compilador.pdb
+C:\Users\15593866\Documents\compiladores2018\AnalisadorLexical\obj\Debug\netcoreapp2.0\Compilador.csprojResolveAssemblyReference.cache
+C:\Users\15593866\Documents\compiladores2018\AnalisadorLexical\obj\Debug\netcoreapp2.0\Compilador.csproj.CoreCompileInputs.cache
+C:\Users\15593866\Documents\compiladores2018\AnalisadorLexical\obj\Debug\netcoreapp2.0\Compilador.AssemblyInfoInputs.cache
+C:\Users\15593866\Documents\compiladores2018\AnalisadorLexical\obj\Debug\netcoreapp2.0\Compilador.AssemblyInfo.cs
+C:\Users\15593866\Documents\compiladores2018\AnalisadorLexical\obj\Debug\netcoreapp2.0\Compilador.dll
+C:\Users\15593866\Documents\compiladores2018\AnalisadorLexical\obj\Debug\netcoreapp2.0\Compilador.pdb

@@ -670,9 +670,9 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\15593866\\Documents\\compiladores2018\\AnalisadorLexical\\AnalisadorLexical.csproj",
-      "projectName": "AnalisadorLexical",
-      "projectPath": "C:\\Users\\15593866\\Documents\\compiladores2018\\AnalisadorLexical\\AnalisadorLexical.csproj",
+      "projectUniqueName": "C:\\Users\\15593866\\Documents\\compiladores2018\\AnalisadorLexical\\Compilador.csproj",
+      "projectName": "Compilador",
+      "projectPath": "C:\\Users\\15593866\\Documents\\compiladores2018\\AnalisadorLexical\\Compilador.csproj",
       "packagesPath": "C:\\Users\\15593866\\.nuget\\packages\\",
       "outputPath": "C:\\Users\\15593866\\Documents\\compiladores2018\\AnalisadorLexical\\obj\\",
       "projectStyle": "PackageReference",

@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.27428.2027
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VM", "CompiladoresVM\VM.csproj", "{1AF0D7A6-3EF8-4B01-B81E-E71B0888CF68}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnalisadorLexical", "AnalisadorLexical\AnalisadorLexical.csproj", "{AF68B6FF-01B3-4B4D-A7ED-315EF0F41F6E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Compilador", "AnalisadorLexical\Compilador.csproj", "{AF68B6FF-01B3-4B4D-A7ED-315EF0F41F6E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
