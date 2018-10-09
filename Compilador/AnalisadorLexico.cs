@@ -72,6 +72,18 @@ namespace Compilador
         {
             this.token = token;
         }
+
+        internal Token Token
+        {
+            get
+            {
+                throw new System.NotImplementedException();
+            }
+
+            set
+            {
+            }
+        }
     }
 
     class AnalisadorLexico
@@ -129,6 +141,18 @@ namespace Compilador
             coluna = 0;
 
             firstTime = true;
+        }
+
+        internal ExceptionErroLexical ExceptionErroLexical
+        {
+            get
+            {
+                throw new System.NotImplementedException();
+            }
+
+            set
+            {
+            }
         }
 
         public Token PegaToken()

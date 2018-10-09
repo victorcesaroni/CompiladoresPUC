@@ -1,0 +1,102 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Compilador.Token">
+    <Position X="4.75" Y="3.25" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AABAAAAAAAAEAAAAgAAAAAAAAAAAAAAAACAAAAAAAAA=</HashCode>
+      <FileName>AnalisadorLexico.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Compilador.ExceptionErroLexical">
+    <Position X="1" Y="0.5" Width="2.5" />
+    <AssociationLine Name="Token" Type="Compilador.Token" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="3.5" Y="1.342" />
+        <Point X="5.188" Y="1.342" />
+        <Point X="5.188" Y="3.25" />
+      </Path>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAA=</HashCode>
+      <FileName>AnalisadorLexico.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Token" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="Compilador.AnalisadorLexico">
+    <Position X="1" Y="2.75" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>CAAACAQAQMAVEIAAgoAACAAAIAAAABSAAAAQAAKAEAA=</HashCode>
+      <FileName>AnalisadorLexico.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="ExceptionErroLexical" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="Compilador.AnalisadorSintatico">
+    <Position X="9.5" Y="4.75" Width="2.5" />
+    <AssociationLine Name="ExceptionInesperado" Type="Compilador.ExceptionInesperado" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="10.562" Y="4.75" />
+        <Point X="10.562" Y="3.698" />
+        <Point X="9.75" Y="3.698" />
+        <Point X="9.75" Y="2.819" />
+      </Path>
+    </AssociationLine>
+    <AssociationLine Name="ExceptionEsperado" Type="Compilador.ExceptionEsperado" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="11.25" Y="4.75" />
+        <Point X="11.25" Y="3.647" />
+        <Point X="12.188" Y="3.647" />
+        <Point X="12.188" Y="3.011" />
+      </Path>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AAEACAAAIgAADAIIAAAAEAAoAAAABAAAAAAQUAABAAA=</HashCode>
+      <FileName>AnalisadorSintatico.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="AnalisadorLexico" />
+      <Property Name="Token" />
+      <Property Name="ExceptionInesperado" />
+      <Property Name="ExceptionEsperado" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="Compilador.ExceptionEsperado">
+    <Position X="11" Y="0.75" Width="2.5" />
+    <AssociationLine Name="Token" Type="Compilador.Token" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="12.5" Y="0.75" />
+        <Point X="12.5" Y="0.375" />
+        <Point X="6" Y="0.375" />
+        <Point X="6" Y="3.25" />
+      </Path>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AAEAAAAAAAAAAAAEAAAAAAABAAAAAAAAAAAAAAABACA=</HashCode>
+      <FileName>AnalisadorSintatico.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Token" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="Compilador.ExceptionInesperado">
+    <Position X="8.25" Y="0.75" Width="2.5" />
+    <AssociationLine Name="Token" Type="Compilador.Token" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="8.25" Y="1.688" />
+        <Point X="6.875" Y="1.688" />
+        <Point X="6.875" Y="3.25" />
+      </Path>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AAEAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAABACA=</HashCode>
+      <FileName>AnalisadorSintatico.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Token" />
+    </ShowAsAssociation>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

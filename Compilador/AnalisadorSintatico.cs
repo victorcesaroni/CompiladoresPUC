@@ -3,55 +3,79 @@ using System.Collections.Generic;
 using System.IO;
 
 namespace Compilador
-{   
-    class AnalisadorSintatico
+{
+    class ExceptionEsperado : Exception
     {
-        class ExceptionEsperado : Exception
-        {
-            Token token;
-            string message;
-            Simbolo esperado;
+        Token token;
+        string message;
+        Simbolo esperado;
 
-            public ExceptionEsperado(string message, Simbolo esperado, Token token)
+        public ExceptionEsperado(string message, Simbolo esperado, Token token)
+        {
+            this.token = token;
+            this.message = message;
+            this.esperado = esperado;
+        }
+
+        internal Token Token
+        {
+            get
             {
-                this.token = token;
-                this.message = message;
-                this.esperado = esperado;
+                throw new System.NotImplementedException();
             }
 
-            public override string ToString()
+            set
             {
-                string lexema = "DESCONHECIDO";
-                foreach (var pair in AnalisadorLexico.mapaDeSimbolo)
+            }
+        }
+
+        public override string ToString()
+        {
+            string lexema = "DESCONHECIDO";
+            foreach (var pair in AnalisadorLexico.mapaDeSimbolo)
+            {
+                if (pair.Value == esperado)
                 {
-                    if (pair.Value == esperado)
-                    {
-                        lexema = pair.Key;
-                        break;
-                    }
+                    lexema = pair.Key;
+                    break;
                 }
-
-                return String.Format("{2} {0}:{1} (Esperado '{3}' mas recebeu '{4}')", token.linha, token.coluna, message, lexema, token.lexema);
             }
-        }
 
-        class ExceptionInesperado : Exception
+            return String.Format("{2} {0}:{1} (Esperado '{3}' mas recebeu '{4}')", token.linha, token.coluna, message, lexema, token.lexema);
+        }
+    }
+
+    class ExceptionInesperado : Exception
+    {
+        Token token;
+        string message;
+
+        public ExceptionInesperado(string message, Token token)
         {
-            Token token;
-            string message;
+            this.token = token;
+            this.message = message;
+        }
 
-            public ExceptionInesperado(string message, Token token)
+        internal Token Token
+        {
+            get
             {
-                this.token = token;
-                this.message = message;
+                throw new System.NotImplementedException();
             }
 
-            public override string ToString()
+            set
             {
-                return String.Format("{2} {0}:{1} ('{3}' inesperado')", token.linha, token.coluna, message, token.lexema);
             }
         }
 
+        public override string ToString()
+        {
+            return String.Format("{2} {0}:{1} ('{3}' inesperado')", token.linha, token.coluna, message, token.lexema);
+        }
+    }
+
+    class AnalisadorSintatico
+    {       
         public StreamReader arquivo;
         AnalisadorLexico lexico;
         
@@ -85,6 +109,54 @@ namespace Compilador
             }
 
             arquivo.Close();
+        }
+
+        internal AnalisadorLexico AnalisadorLexico
+        {
+            get
+            {
+                throw new System.NotImplementedException();
+            }
+
+            set
+            {
+            }
+        }
+
+        internal Token Token
+        {
+            get
+            {
+                throw new System.NotImplementedException();
+            }
+
+            set
+            {
+            }
+        }
+
+        internal ExceptionInesperado ExceptionInesperado
+        {
+            get
+            {
+                throw new System.NotImplementedException();
+            }
+
+            set
+            {
+            }
+        }
+
+        internal ExceptionEsperado ExceptionEsperado
+        {
+            get
+            {
+                throw new System.NotImplementedException();
+            }
+
+            set
+            {
+            }
         }
 
         public void Analisa()
