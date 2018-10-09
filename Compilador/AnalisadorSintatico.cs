@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 
 namespace Compilador
 {   
@@ -76,7 +75,14 @@ namespace Compilador
                 Console.WriteLine(ex.Message);
             }*/
 
-            Analisa();
+            try
+            {
+                Analisa();
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.ToString());
+            }
 
             arquivo.Close();
         }

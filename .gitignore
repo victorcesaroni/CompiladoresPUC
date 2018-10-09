@@ -2,3 +2,8 @@ CompiladoresVM/bin/Debug/*
 CompiladoresVM/bin/Release/*
 CompiladoresVM/obj/Debug/*
 CompiladoresVM/obj/Release/*
+
+Compilador/bin/Debug/*
+Compilador/bin/Release/*
+Compilador/obj/Debug/*
+Compilador/obj/Release/*

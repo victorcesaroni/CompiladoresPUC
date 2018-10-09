@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 
 namespace Compilador
 {
@@ -120,53 +118,57 @@ namespace Compilador
 
         public StreamReader arquivo;
         ulong linha, coluna;
-        char c;
+        public char c;
+        bool firstTime;
 
-        public AnalisadorLexico(StreamReader arq)
+        public AnalisadorLexico(StreamReader arquivo)
         {
-            arquivo = new StreamReader(new FileStream(caminhoArquivo, FileMode.Open));
+            this.arquivo = arquivo;
 
-            linha = 0;
+            linha = 1;
             coluna = 0;
 
-            c = Ler();
-
-            while (!FimDeArquivo())
-            {
-                
-            }
-
-            arquivo.Close();
+            firstTime = true;
         }
 
-        public Token PegaToke()
+        public Token PegaToken()
         {
-            while ((c == '{' || VerificaEspaco(c)) && !FimDeArquivo())
+            if (firstTime)
             {
-                if (c == '{')
-                {
-                    while (c != '}')
-                    {
-                        c = Ler();
-
-                        if (FimDeArquivo() && c != '}')
-                        {
-                            throw new Exception(String.Format("Erro léxico L:{0} C:{1}", linha, coluna));
-                        }
-                    }
-
-                    c = Ler();
-                }
-
-                while (VerificaEspaco(c) && !FimDeArquivo())
-                {
-                    c = Ler();
-                }
+                c = Ler();
+                firstTime = false;
             }
 
             if (!FimDeArquivo())
             {
-                return CriaToken();
+                while ((c == '{' || VerificaEspaco(c)) && !FimDeArquivo())
+                {
+                    if (c == '{')
+                    {
+                        while (c != '}')
+                        {
+                            c = Ler();
+
+                            if (FimDeArquivo() && c != '}')
+                            {
+                                throw new Exception(String.Format("Erro léxico L:{0} C:{1}", linha, coluna));
+                            }
+                        }
+
+                        c = Ler();
+                    }
+
+                    while (VerificaEspaco(c) && !FimDeArquivo())
+                    {
+                        c = Ler();
+                    }
+                }
+
+                if (!FimDeArquivo())
+                {
+                    var t = CriaToken();
+                    return t;
+                }
             }
 
             throw new Exception("Nao foi possivel pegar proximo token");
@@ -371,7 +373,7 @@ namespace Compilador
             return c;
         }
 
-        private bool FimDeArquivo()
+        public bool FimDeArquivo()
         {
             return arquivo.EndOfStream;
         }
