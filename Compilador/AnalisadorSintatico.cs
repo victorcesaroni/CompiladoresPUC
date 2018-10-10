@@ -15,18 +15,7 @@ namespace Compilador
             this.token = token;
             this.message = message;
             this.esperado = esperado;
-        }
-
-        internal Token Token
-        {
-            get
-            {
-                throw new System.NotImplementedException();
-            }
-
-            set
-            {
-            }
+            this.message = this.ToString();
         }
 
         public override string ToString()
@@ -54,18 +43,7 @@ namespace Compilador
         {
             this.token = token;
             this.message = message;
-        }
-
-        internal Token Token
-        {
-            get
-            {
-                throw new System.NotImplementedException();
-            }
-
-            set
-            {
-            }
+            this.message = this.ToString();
         }
 
         public override string ToString()
@@ -75,10 +53,10 @@ namespace Compilador
     }
 
     class AnalisadorSintatico
-    {       
+    {
         public StreamReader arquivo;
         AnalisadorLexico lexico;
-        
+
         Token token = new Token();
 
         public AnalisadorSintatico(string caminhoArquivo)
@@ -99,93 +77,39 @@ namespace Compilador
                 Console.WriteLine(ex.Message);
             }*/
 
-            try
+            /*try
             {
                 Analisa();
             }
             catch (Exception e)
             {
                 throw new Exception(e.ToString());
-            }
+            }*/
+
+            Analisa();
 
             arquivo.Close();
-        }
-
-        internal AnalisadorLexico AnalisadorLexico
-        {
-            get
-            {
-                throw new System.NotImplementedException();
-            }
-
-            set
-            {
-            }
-        }
-
-        internal Token Token
-        {
-            get
-            {
-                throw new System.NotImplementedException();
-            }
-
-            set
-            {
-            }
-        }
-
-        internal ExceptionInesperado ExceptionInesperado
-        {
-            get
-            {
-                throw new System.NotImplementedException();
-            }
-
-            set
-            {
-            }
-        }
-
-        internal ExceptionEsperado ExceptionEsperado
-        {
-            get
-            {
-                throw new System.NotImplementedException();
-            }
-
-            set
-            {
-            }
         }
 
         public void Analisa()
         {
             Lexico();
-            if (ChecaSimboloEsperado(Simbolo.S_PROGRAMA))
+            ChecaSimboloEsperado(Simbolo.S_PROGRAMA);
+            Lexico();
+            ChecaSimboloEsperado(Simbolo.S_IDENTIFICADOR);
+            Lexico();
+            ChecaSimboloEsperado(Simbolo.S_PONTO_VIRGULA);
+            AnalisaBloco();
+            ChecaSimboloEsperado(Simbolo.S_PONTO);
+
+            try
             {
                 Lexico();
-                if (ChecaSimboloEsperado(Simbolo.S_IDENTIFICADOR))
-                {
-                    Lexico();
-                    if (ChecaSimboloEsperado(Simbolo.S_PONTO_VIRGULA))
-                    {
-                        AnalisaBloco();
-
-                        if (ChecaSimboloEsperado(Simbolo.S_PONTO))
-                        {
-                            try
-                            {
-                                Lexico();
-                                throw new ExceptionEsperado("Token inesperado apos final de programa", Simbolo.S_PONTO, token);
-                            }
-                            catch
-                            {
-                                Console.WriteLine("SUCESSO");
-                            }
-                        }
-                    }
-                }
+                throw new ExceptionEsperado("Token inesperado apos final de programa", Simbolo.S_PONTO, token);
+            }
+            catch
+            {
+                Console.WriteLine("SUCESSO");
             }
         }
 
@@ -199,82 +123,306 @@ namespace Compilador
 
         void AnalisaEtapaDeclaracaoVariaveis()
         {
-            if (ChecaSimboloEsperado(Simbolo.S_VAR, true))
+            if (token.simbolo == Simbolo.S_VAR)
             {
                 Lexico();
-                if (ChecaSimboloEsperado(Simbolo.S_IDENTIFICADOR))
-                {
-                    while (token.simbolo == Simbolo.S_IDENTIFICADOR)
-                    {
-                        AnalisaVariaveis();
+                ChecaSimboloEsperado(Simbolo.S_IDENTIFICADOR);
 
-                        if (ChecaSimboloEsperado(Simbolo.S_PONTO_VIRGULA))
-                        {
-                            Lexico();
-                        }
-                    }
+                while (token.simbolo == Simbolo.S_IDENTIFICADOR)
+                {
+                    AnalisaVariaveis();
+                    ChecaSimboloEsperado(Simbolo.S_PONTO_VIRGULA);
+                    Lexico();
                 }
             }
         }
 
         void AnalisaSubRotinas()
         {
-            
+            /*if (token.simbolo == Simbolo.S_PROCEDIMENTO || token.simbolo == Simbolo.S_FUNCAO)
+            {
+
+            }*/
+
+            while (token.simbolo == Simbolo.S_PROCEDIMENTO || token.simbolo == Simbolo.S_FUNCAO)
+            {
+                if (token.simbolo == Simbolo.S_PROCEDIMENTO)
+                    AnalisaDeclaracaoProcedimento();
+                else
+                    AnalisaDeclaracaoFuncao();
+
+                ChecaSimboloEsperado(Simbolo.S_PONTO_VIRGULA);
+                Lexico();                
+            }
+        }
+
+        void AnalisaDeclaracaoFuncao()
+        {
+            Lexico();
+            ChecaSimboloEsperado(Simbolo.S_IDENTIFICADOR);
+            Lexico();
+            ChecaSimboloEsperado(Simbolo.S_DOIS_PONTOS);
+            Lexico();
+
+            if (token.simbolo != Simbolo.S_INTEIRO && token.simbolo != Simbolo.S_BOOLEANO)
+                throw new ExceptionInesperado("", token);
+
+            Lexico();
+            if (token.simbolo == Simbolo.S_PONTO_VIRGULA)
+                AnalisaBloco();
+        }
+
+        void AnalisaDeclaracaoProcedimento()
+        {
+            Lexico();
+            ChecaSimboloEsperado(Simbolo.S_IDENTIFICADOR);
+            Lexico();
+            ChecaSimboloEsperado(Simbolo.S_PONTO_VIRGULA);
+            AnalisaBloco();
         }
 
         void AnalisaComandos()
         {
-            if (ChecaSimboloEsperado(Simbolo.S_INICIO, true))
+            /*if (token.simbolo == Simbolo.S_INICIO)
             {
+                Lexico();
+                AnalisaComandoSimples();
 
+                while (token.simbolo != Simbolo.S_FIM)
+                {
+                    //if (token.simbolo == Simbolo.S_INICIO)
+                    //  AnalisaComandos();
+                    
+                     ChecaSimboloEsperado(Simbolo.S_PONTO_VIRGULA);
+
+                    Lexico();
+                    if (token.simbolo != Simbolo.S_FIM)
+                        AnalisaComandoSimples();
+                }
+            }*/
+
+            ChecaSimboloEsperado(Simbolo.S_INICIO);
+
+            Lexico();
+            AnalisaComandoSimples();
+
+
+            while (token.simbolo != Simbolo.S_FIM)
+            {
+                ChecaSimboloEsperado(Simbolo.S_PONTO_VIRGULA);
+                Lexico();
+                AnalisaComandoSimples();
+            }
+
+            ChecaSimboloEsperado(Simbolo.S_FIM);
+        }
+
+        void AnalisaComandoSimples()
+        {
+            if (token.simbolo == Simbolo.S_IDENTIFICADOR)
+                AnalisaAtribChProcedimento();
+            else if (token.simbolo == Simbolo.S_SE)
+                AnalisaSe();
+            else if (token.simbolo == Simbolo.S_ENQUANTO)
+                AnalisaEnquanto();
+            else if (token.simbolo == Simbolo.S_LEIA)
+                AnalisaLeia();
+            else if (token.simbolo == Simbolo.S_ESCREVA)
+                AnalisaEscreva();
+            else if (token.simbolo == Simbolo.S_INICIO)
+                AnalisaComandos();
+        }
+
+        void AnalisaAtribChProcedimento()
+        {
+            Lexico();
+            if (token.simbolo == Simbolo.S_ATRIBUICAO)
+                AnalisaAtribuicao(); // ja leu um identificador?
+            else
+                ChamadaProcedimento();
+        }
+
+        void ChamadaProcedimento()
+        {
+            Lexico();
+            ChecaSimboloEsperado(Simbolo.S_IDENTIFICADOR);
+            Lexico();
+        }
+
+        void AnalisaAtribuicao()
+        {
+            Lexico();
+            /*ChecaSimboloEsperado(Simbolo.S_IDENTIFICADOR);
+            Lexico();
+            ChecaSimboloInesperado(Simbolo.S_ATRIBUICAO);
+            Lexico();*/
+            AnalisaExpressao();
+        }
+
+        void AnalisaSe()
+        {
+            Lexico();
+            AnalisaExpressao();
+            ChecaSimboloEsperado(Simbolo.S_ENTAO);
+            Lexico();
+            AnalisaComandoSimples();
+            if (token.simbolo == Simbolo.S_SENAO)
+            {
+                Lexico();
+                AnalisaComandoSimples();
             }
         }
 
-        void AnalisaVariaveis()
+        void AnalisaEnquanto()
         {
-            do
-            {
-                if (ChecaSimboloEsperado(Simbolo.S_IDENTIFICADOR))
-                {
-                    Lexico();
-                    if (token.simbolo == Simbolo.S_VIRGULA || token.simbolo == Simbolo.S_DOIS_PONTOS)
-                    {
-                        if (token.simbolo == Simbolo.S_VIRGULA)
-                        {
-                            Lexico();
-                            ChecaSimboloInesperado(Simbolo.S_DOIS_PONTOS);
-                        }
-                    }
-                }
-
-                if (lexico.FimDeArquivo() && token.simbolo != Simbolo.S_DOIS_PONTOS)
-                    throw new ExceptionEsperado("Final de arquivo inesperado", Simbolo.S_DOIS_PONTOS, token);
-            } while (token.simbolo != Simbolo.S_DOIS_PONTOS);
-            
             Lexico();
+            AnalisaExpressao();
 
-            if (token.simbolo == Simbolo.S_INTEIRO || token.simbolo == Simbolo.S_BOOLEANO)
+            ChecaSimboloEsperado(Simbolo.S_FACA);
+
+            Lexico();
+            AnalisaComandoSimples();
+        }
+
+        void AnalisaExpressao()
+        {
+            AnalisaExpressaoSimples();
+
+            if (token.simbolo == Simbolo.S_MAIOR || 
+                token.simbolo == Simbolo.S_MENOR || 
+                token.simbolo == Simbolo.S_MAIOR_IG || 
+                token.simbolo == Simbolo.S_MENOR_IG || 
+                token.simbolo == Simbolo.S_DIF)
+            {
+                Lexico();
+                AnalisaExpressaoSimples();
+            }
+        }
+
+        void AnalisaExpressaoSimples()
+        {
+            if (token.simbolo == Simbolo.S_MAIS || token.simbolo == Simbolo.S_MENOS)
+                Lexico();                
+            
+            AnalisaTermo();
+
+            while (token.simbolo == Simbolo.S_MAIS || token.simbolo == Simbolo.S_MENOS || token.simbolo == Simbolo.S_OU)
+            {
+                Lexico();
+                AnalisaTermo();
+            }
+        }
+
+        void AnalisaFator()
+        {
+            if (token.simbolo == Simbolo.S_IDENTIFICADOR)
+            {
+                AnalisaChamadaFuncao();
+            }
+            else if (token.simbolo == Simbolo.S_NUMERO)
+            {
+                Lexico();
+            }
+            else if (token.simbolo == Simbolo.S_NAO)
+            {
+                Lexico();
+                AnalisaFator();
+            }
+            else if (token.simbolo == Simbolo.S_ABRE_PARENTESES)
+            {
+                Lexico();
+                AnalisaExpressao();
+                ChecaSimboloEsperado(Simbolo.S_FECHA_PARENTESES);
+                Lexico();
+            }
+            else if (token.lexema == "verdadeiro" || token.lexema == "falso")
             {
                 Lexico();
             }
             else throw new ExceptionInesperado("", token);
         }
 
-        bool ChecaSimboloEsperado(Simbolo s, bool opcional = false, string message = "")
+        void AnalisaChamadaFuncao()
         {
-            if (token.simbolo == s)
-                return true;
-
-            if (!opcional)
-                throw new ExceptionEsperado(message, s, token);
-
-            return false;
+            ChecaSimboloEsperado(Simbolo.S_IDENTIFICADOR);
+            Lexico();
         }
 
-        void ChecaSimboloInesperado(Simbolo s, string message = "")
+        void AnalisaTermo()
+        {
+            AnalisaFator();
+
+            while (token.simbolo == Simbolo.S_MULT || token.simbolo == Simbolo.S_DIV || token.simbolo == Simbolo.S_E)
+            {
+                Lexico();
+                AnalisaFator();
+            }
+        }
+
+        void AnalisaLeia()
+        {
+            Lexico();
+            ChecaSimboloEsperado(Simbolo.S_ABRE_PARENTESES);
+            Lexico();
+            ChecaSimboloEsperado(Simbolo.S_IDENTIFICADOR);
+            Lexico();
+            ChecaSimboloEsperado(Simbolo.S_FECHA_PARENTESES);
+            Lexico();
+        }
+
+        void AnalisaEscreva()
+        {
+            Lexico();
+            ChecaSimboloEsperado(Simbolo.S_ABRE_PARENTESES);
+            Lexico();
+            ChecaSimboloEsperado(Simbolo.S_IDENTIFICADOR);
+            Lexico();
+            ChecaSimboloEsperado(Simbolo.S_FECHA_PARENTESES);
+            Lexico();
+        }
+
+        void AnalisaVariaveis()
+        {
+            do
+            {
+                ChecaSimboloEsperado(Simbolo.S_IDENTIFICADOR);
+
+                Lexico();
+                if (token.simbolo == Simbolo.S_VIRGULA || token.simbolo == Simbolo.S_DOIS_PONTOS)
+                {
+                    if (token.simbolo == Simbolo.S_VIRGULA)
+                    {
+                        Lexico();
+                        ChecaSimboloInesperado(Simbolo.S_DOIS_PONTOS);
+                    }
+                }
+
+                if (lexico.FimDeArquivo() && token.simbolo != Simbolo.S_DOIS_PONTOS)
+                    throw new ExceptionEsperado("Final de arquivo inesperado", Simbolo.S_DOIS_PONTOS, token);
+            } while (token.simbolo != Simbolo.S_DOIS_PONTOS);
+
+            Lexico();
+            AnalisaTipo();
+        }
+
+        void AnalisaTipo()
+        {
+            if (token.simbolo != Simbolo.S_INTEIRO && token.simbolo != Simbolo.S_BOOLEANO)
+                throw new ExceptionInesperado("", token);
+
+            Lexico();
+        }
+
+        void ChecaSimboloEsperado(Simbolo s)
+        {
+            if (token.simbolo != s)
+                throw new ExceptionEsperado("", s, token);
+        }
+
+        void ChecaSimboloInesperado(Simbolo s)
         {
             if (token.simbolo == s)
-                throw new ExceptionInesperado(message, token);
+                throw new ExceptionInesperado("", token);
         }
 
         public void Lexico()
