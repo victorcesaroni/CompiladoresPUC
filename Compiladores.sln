@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VM", "CompiladoresVM\VM.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Compilador", "Compilador\Compilador.csproj", "{4E06DABD-2E96-4DE5-8F94-8D4DEAD8B6A0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IDE", "IDE\IDE.csproj", "{B0B5E56A-FC50-4687-8DA7-7EC24D116EFE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{4E06DABD-2E96-4DE5-8F94-8D4DEAD8B6A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4E06DABD-2E96-4DE5-8F94-8D4DEAD8B6A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4E06DABD-2E96-4DE5-8F94-8D4DEAD8B6A0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B0B5E56A-FC50-4687-8DA7-7EC24D116EFE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B0B5E56A-FC50-4687-8DA7-7EC24D116EFE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B0B5E56A-FC50-4687-8DA7-7EC24D116EFE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B0B5E56A-FC50-4687-8DA7-7EC24D116EFE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

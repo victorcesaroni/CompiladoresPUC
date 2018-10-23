@@ -1,0 +1,11 @@
+C:\Users\victor020717\Documents\compiladores2018\IDE\bin\Debug\IDE.exe.config
+C:\Users\victor020717\Documents\compiladores2018\IDE\bin\Debug\IDE.exe
+C:\Users\victor020717\Documents\compiladores2018\IDE\bin\Debug\IDE.pdb
+C:\Users\victor020717\Documents\compiladores2018\IDE\obj\Debug\IDE.csprojResolveAssemblyReference.cache
+C:\Users\victor020717\Documents\compiladores2018\IDE\obj\Debug\IDE.Form1.resources
+C:\Users\victor020717\Documents\compiladores2018\IDE\obj\Debug\IDE.Properties.Resources.resources
+C:\Users\victor020717\Documents\compiladores2018\IDE\obj\Debug\IDE.csproj.GenerateResource.Cache
+C:\Users\victor020717\Documents\compiladores2018\IDE\obj\Debug\IDE.exe
+C:\Users\victor020717\Documents\compiladores2018\IDE\obj\Debug\IDE.pdb
+C:\Users\victor020717\Documents\compiladores2018\IDE\bin\Debug\FastColoredTextBox.dll
+C:\Users\victor020717\Documents\compiladores2018\IDE\bin\Debug\FastColoredTextBox.xml
