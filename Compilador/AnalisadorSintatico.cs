@@ -4,18 +4,17 @@ using System.IO;
 
 namespace Compilador
 {
-    class ExceptionEsperado : Exception
+    public class ExceptionSimboloEsperado : Exception
     {
-        Token token;
-        string message;
-        Simbolo esperado;
+        public Token token;
+        public string info;
+        public Simbolo esperado;
 
-        public ExceptionEsperado(string message, Simbolo esperado, Token token)
+        public ExceptionSimboloEsperado(string info, Simbolo esperado, Token token)
         {
             this.token = token;
-            this.message = message;
+            this.info = info;
             this.esperado = esperado;
-            this.message = this.ToString();
         }
 
         public override string ToString()
@@ -30,32 +29,31 @@ namespace Compilador
                 }
             }
 
-            return String.Format("{2} {0}:{1} (Esperado '{3}' mas recebeu '{4}')", token.linha, token.coluna, message, lexema, token.lexema);
+            return info + " " + "Esperado '" + lexema + "' mas recebeu '" + token.lexema + "'";
         }
     }
 
-    class ExceptionInesperado : Exception
+    public class ExceptionSimboloInesperado : Exception
     {
-        Token token;
-        string message;
+        public Token token;
+        public string info;
 
-        public ExceptionInesperado(string message, Token token)
+        public ExceptionSimboloInesperado(string info, Token token)
         {
             this.token = token;
-            this.message = message;
-            this.message = this.ToString();
+            this.info = info;
         }
 
         public override string ToString()
         {
-            return String.Format("{2} {0}:{1} ('{3}' inesperado')", token.linha, token.coluna, message, token.lexema);
+            return info + " " + "Token inesperado '" + token.lexema + "'";
         }
     }
 
-    class AnalisadorSintatico
+    public class AnalisadorSintatico
     {
         public StreamReader arquivo;
-        AnalisadorLexico lexico;
+        public AnalisadorLexico lexico;
 
         Token token = new Token();
 
@@ -63,7 +61,10 @@ namespace Compilador
         {
             arquivo = new StreamReader(new FileStream(caminhoArquivo, FileMode.Open));
             lexico = new AnalisadorLexico(arquivo);
+        }
 
+        public void Iniciar()
+        {
             /*try
             {
                 while (!lexico.FimDeArquivo())
@@ -88,6 +89,11 @@ namespace Compilador
 
             Analisa();
 
+            Finalizar();
+        }
+
+        public void Finalizar()
+        {
             arquivo.Close();
         }
 
@@ -102,15 +108,9 @@ namespace Compilador
             AnalisaBloco();
             ChecaSimboloEsperado(Simbolo.S_PONTO);
 
-            try
-            {
-                Lexico();
-                throw new ExceptionEsperado("Token inesperado apos final de programa", Simbolo.S_PONTO, token);
-            }
-            catch
-            {
-                Console.WriteLine("SUCESSO");
-            }
+            Lexico();
+            if (token.simbolo != Simbolo.S_FINAL_DE_ARQUIVO)
+                throw new ExceptionSimboloInesperado("Inesperado apos final de programa", token);
         }
 
         void AnalisaBloco()
@@ -165,7 +165,7 @@ namespace Compilador
             Lexico();
 
             if (token.simbolo != Simbolo.S_INTEIRO && token.simbolo != Simbolo.S_BOOLEANO)
-                throw new ExceptionInesperado("", token);
+                throw new ExceptionSimboloInesperado("", token);
 
             Lexico();
             if (token.simbolo == Simbolo.S_PONTO_VIRGULA)
@@ -190,8 +190,8 @@ namespace Compilador
 
                 while (token.simbolo != Simbolo.S_FIM)
                 {
-                    //if (token.simbolo == Simbolo.S_INICIO)
-                    //  AnalisaComandos();
+                    if (token.simbolo == Simbolo.S_INICIO)
+                        AnalisaComandos();
                     
                      ChecaSimboloEsperado(Simbolo.S_PONTO_VIRGULA);
 
@@ -205,16 +205,19 @@ namespace Compilador
 
             Lexico();
             AnalisaComandoSimples();
-
-
+            
             while (token.simbolo != Simbolo.S_FIM)
             {
                 ChecaSimboloEsperado(Simbolo.S_PONTO_VIRGULA);
                 Lexico();
-                AnalisaComandoSimples();
+
+                if (token.simbolo != Simbolo.S_FIM)
+                    AnalisaComandoSimples();
             }
 
             ChecaSimboloEsperado(Simbolo.S_FIM);
+
+            Lexico();
         }
 
         void AnalisaComandoSimples()
@@ -231,6 +234,8 @@ namespace Compilador
                 AnalisaEscreva();
             else if (token.simbolo == Simbolo.S_INICIO)
                 AnalisaComandos();
+            else
+                throw new ExceptionSimboloInesperado("", token);
         }
 
         void AnalisaAtribChProcedimento()
@@ -244,9 +249,9 @@ namespace Compilador
 
         void ChamadaProcedimento()
         {
-            Lexico();
-            ChecaSimboloEsperado(Simbolo.S_IDENTIFICADOR);
-            Lexico();
+            //Lexico();
+            //ChecaSimboloEsperado(Simbolo.S_IDENTIFICADOR);
+           // Lexico();
         }
 
         void AnalisaAtribuicao()
@@ -339,7 +344,7 @@ namespace Compilador
             {
                 Lexico();
             }
-            else throw new ExceptionInesperado("", token);
+            else throw new ExceptionSimboloInesperado("", token);
         }
 
         void AnalisaChamadaFuncao()
@@ -398,7 +403,7 @@ namespace Compilador
                 }
 
                 if (lexico.FimDeArquivo() && token.simbolo != Simbolo.S_DOIS_PONTOS)
-                    throw new ExceptionEsperado("Final de arquivo inesperado", Simbolo.S_DOIS_PONTOS, token);
+                    throw new ExceptionSimboloEsperado("Final de arquivo inesperado", Simbolo.S_DOIS_PONTOS, token);
             } while (token.simbolo != Simbolo.S_DOIS_PONTOS);
 
             Lexico();
@@ -408,7 +413,7 @@ namespace Compilador
         void AnalisaTipo()
         {
             if (token.simbolo != Simbolo.S_INTEIRO && token.simbolo != Simbolo.S_BOOLEANO)
-                throw new ExceptionInesperado("", token);
+                throw new ExceptionSimboloInesperado("", token);
 
             Lexico();
         }
@@ -416,13 +421,13 @@ namespace Compilador
         void ChecaSimboloEsperado(Simbolo s)
         {
             if (token.simbolo != s)
-                throw new ExceptionEsperado("", s, token);
+                throw new ExceptionSimboloEsperado("", s, token);
         }
 
         void ChecaSimboloInesperado(Simbolo s)
         {
             if (token.simbolo == s)
-                throw new ExceptionInesperado("", token);
+                throw new ExceptionSimboloInesperado("", token);
         }
 
         public void Lexico()

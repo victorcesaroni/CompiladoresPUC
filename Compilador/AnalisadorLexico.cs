@@ -4,7 +4,7 @@ using System.IO;
 
 namespace Compilador
 {
-    enum Simbolo
+    public enum Simbolo
     {
         S_PROGRAMA,
         S_INICIO,
@@ -43,9 +43,10 @@ namespace Compilador
         S_OU,
         S_NAO,
         S_DOIS_PONTOS,
+        S_FINAL_DE_ARQUIVO,
     };
 
-    class Token
+    public class Token
     {
         public Token()
         {
@@ -65,16 +66,25 @@ namespace Compilador
         public ulong linha, coluna;
     }
 
-    class ExceptionErroLexical : Exception
+    public class ExceptionErroLexical : Exception
     {
-        Token token;
-        public ExceptionErroLexical(Token token)
+        public ulong linha, coluna;
+        public string info;
+
+        public ExceptionErroLexical(ulong linha, ulong coluna, string info)
         {
-            this.token = token;
+            this.linha = linha;
+            this.coluna = coluna;
+            this.info = info;
+        }
+
+        public override string ToString()
+        {
+            return info;
         }
     }
 
-    class AnalisadorLexico
+    public class AnalisadorLexico
     {
         public static Dictionary<string, Simbolo> mapaDeSimbolo = new Dictionary<string, Simbolo>() {
             { "programa", Simbolo.S_PROGRAMA },
@@ -120,17 +130,19 @@ namespace Compilador
         ulong linha, coluna;
         public char c;
         bool firstTime;
+        bool reachedEndOfFile;
 
         public AnalisadorLexico(StreamReader arquivo)
         {
             this.arquivo = arquivo;
 
-            linha = 1;
+            linha = 0;
             coluna = 0;
 
             firstTime = true;
+            reachedEndOfFile = false;
         }
-        
+
         public Token PegaToken()
         {
             if (firstTime)
@@ -139,40 +151,12 @@ namespace Compilador
                 firstTime = false;
             }
 
-            if (!FimDeArquivo())
-            {
-                while ((c == '{' || VerificaEspaco(c)) && !FimDeArquivo())
-                {
-                    if (c == '{')
-                    {
-                        while (c != '}')
-                        {
-                            c = Ler();
+            ConsomeComentarioEspaco();
 
-                            if (FimDeArquivo() && c != '}')
-                            {
-                                throw new Exception(String.Format("Erro léxico L:{0} C:{1}", linha, coluna));
-                            }
-                        }
-
-                        c = Ler();
-                    }
-
-                    while (VerificaEspaco(c) && !FimDeArquivo())
-                    {
-                        c = Ler();
-                    }
-                }
-
-                if (!FimDeArquivo())
-                {
-                    var t = CriaToken();
-                    return t;
-                }
-            }
-
-            throw new Exception("Nao foi possivel pegar proximo token");
+            Token t = CriaToken();
+            return t;
         }
+
         public Token CriaToken()
         {
             if (VerificaDigito(c))
@@ -187,9 +171,38 @@ namespace Compilador
                 return TrataOperadorRelacional();
             else if (VerificaPontuacao(c))
                 return TrataPontuacao();
+            else if (FimDeArquivo())
+                return new Token(Simbolo.S_FINAL_DE_ARQUIVO, "", linha, coluna - 1);
 
-            throw new Exception(String.Format("Erro léxico L:{0} C:{1}", linha, coluna));
+            throw new ExceptionErroLexical(linha, coluna, "Simbolo inesperado");
         }
+
+        public void ConsomeComentarioEspaco()
+        {
+            while ((c == '{' || VerificaEspaco(c)) && !FimDeArquivo())
+            {
+                if (c == '{')
+                {
+                    while (c != '}')
+                    {
+                        c = Ler();
+
+                        if (FimDeArquivo() && c != '}')
+                        {
+                            throw new ExceptionErroLexical(linha, coluna, "Comentario nao finalizado");
+                        }
+                    }
+
+                    c = Ler();
+                }
+
+                while (VerificaEspaco(c) && !FimDeArquivo())
+                {
+                    c = Ler();
+                }
+            }
+        }
+
         public Token TrataPontuacao()
         {
             Token token = new Token(mapaDeSimbolo[c.ToString()], c.ToString(), linha, coluna);
@@ -243,7 +256,7 @@ namespace Compilador
                 }
                 else
                 {
-                    throw new Exception(String.Format("Erro léxico L:{0} C:{1}", linha, coluna));
+                    throw new ExceptionErroLexical(linha, coluna, "Simbolo inesperado");
                 }
             }
             else if (c == '=')
@@ -361,13 +374,21 @@ namespace Compilador
 
         private char Ler()
         {
+            if (FimDeArquivo())
+            {
+                return '\uffff'; // caracter invalido
+            }
+
             char c = (char)arquivo.Read();
 
-            coluna++;
             if (c == '\n')
             {
                 coluna = 0;
                 linha++;
+            }
+            else
+            {
+                coluna++;
             }
 
             return c;
