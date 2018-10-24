@@ -7,3 +7,8 @@ Compilador/bin/Debug/*
 Compilador/bin/Release/*
 Compilador/obj/Debug/*
 Compilador/obj/Release/*
+
+IDE/bin/Debug/*
+IDE/bin/Release/*
+IDE/obj/Debug/*
+IDE/obj/Release/*

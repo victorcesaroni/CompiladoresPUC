@@ -17,6 +17,9 @@ namespace IDE
     public partial class Form1 : Form
     {
         Style redStyle = new TextStyle(Brushes.Black, Brushes.LightSalmon, FontStyle.Regular);
+        Style blueStyle = new TextStyle(Brushes.Blue, Brushes.White, FontStyle.Bold);
+        Style negritoStyle = new TextStyle(Brushes.Black, Brushes.White, FontStyle.Bold);
+        Style salmonStyle = new TextStyle(Brushes.Salmon, Brushes.White, FontStyle.Regular);
 
         AnalisadorSintatico analisadorSintatico = null;
         string path = null;
@@ -123,6 +126,59 @@ namespace IDE
             }
 
             analisadorSintatico.arquivo.Close();
+        }
+
+        private void textBoxEditor_TextChangedDelayed(object sender, TextChangedEventArgs e)
+        {
+            if (path == null)
+                return;
+
+            {
+                Range rng = new Range(textBoxEditor, 0, 0, textBoxEditor.Lines[textBoxEditor.Lines.Count - 1].Length, textBoxEditor.Lines.Count - 1);
+                rng.ClearStyle(redStyle);
+            }
+
+            AnalisadorSintatico tmp = new AnalisadorSintatico(path);
+
+            try
+            {
+                listBox1.Items.Clear();
+
+                while (!tmp.lexico.FimDeArquivo())
+                {
+                    var token = tmp.lexico.PegaToken();
+                    listBox1.Items.Add(token.linha + " " + token.lexema);
+
+                    Range rng = new Range(textBoxEditor, (int)token.coluna - token.lexema.Length - 1, (int)token.linha, (int)token.coluna - 1, (int)token.linha);
+
+                    if (token.simbolo == Simbolo.S_PROCEDIMENTO ||
+                        token.simbolo == Simbolo.S_FACA ||
+                        token.simbolo == Simbolo.S_SE ||
+                        token.simbolo == Simbolo.S_SENAO ||
+                        token.simbolo == Simbolo.S_ENTAO ||
+                        token.simbolo == Simbolo.S_VAR ||
+                        token.simbolo == Simbolo.S_ENQUANTO ||
+                        token.simbolo == Simbolo.S_BOOLEANO ||
+                        token.simbolo == Simbolo.S_INTEIRO)
+                    {
+                        rng.SetStyle(blueStyle);
+                    }
+
+                    if (token.simbolo == Simbolo.S_INICIO ||
+                        token.simbolo == Simbolo.S_FIM)
+                    {
+                        rng.SetStyle(negritoStyle);
+                    }
+
+                    if (token.simbolo == Simbolo.S_NUMERO)
+                    {                        
+                        rng.SetStyle(salmonStyle);
+                    }
+                }
+            }
+            catch { }
+
+            tmp.arquivo.Close();
         }
     }
 }
