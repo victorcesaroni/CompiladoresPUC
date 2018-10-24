@@ -20,7 +20,8 @@ namespace IDE
         Style blueStyle = new TextStyle(Brushes.Blue, Brushes.White, FontStyle.Bold);
         Style negritoStyle = new TextStyle(Brushes.Black, Brushes.White, FontStyle.Bold);
         Style salmonStyle = new TextStyle(Brushes.Salmon, Brushes.White, FontStyle.Regular);
-
+        Style grayStyle = new TextStyle(Brushes.LightGray, Brushes.White, FontStyle.Bold);
+        
         AnalisadorSintatico analisadorSintatico = null;
         string path = null;
 
@@ -74,13 +75,9 @@ namespace IDE
 
         private void compilarToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            {
-                Range rng = new Range(textBoxEditor, 0, 0, textBoxEditor.Lines[textBoxEditor.Lines.Count - 1].Length, textBoxEditor.Lines.Count - 1);
-                rng.ClearStyle(redStyle);
-            }
+            Colorir();
 
             listViewError.Items.Clear();
-            listBox1.Items.Clear();
 
             Save();
 
@@ -88,12 +85,6 @@ namespace IDE
 
             try
             {
-                /*while (!analisadorSintatico.lexico.FimDeArquivo())
-                {
-                    var token = analisadorSintatico.lexico.PegaToken();
-                    listBox1.Items.Add(token.linha + " " + token.lexema);
-                }*/
-
                 analisadorSintatico.Iniciar();
 
                 listViewError.Items.Add(new ListViewItem(new string[] { "0", "0", "Compilacao terminou com sucesso" }));
@@ -101,20 +92,23 @@ namespace IDE
             catch (ExceptionErroLexical ex)
             {
                 Range rng = new Range(textBoxEditor, (int)ex.coluna, (int)ex.linha, (int)ex.coluna + 1, (int)ex.linha);
+                ClearStyles(rng);
                 rng.SetStyle(redStyle);
 
                 listViewError.Items.Add(new ListViewItem(new string[] { ex.linha.ToString(), ex.coluna.ToString(), "Erro lexical: " + ex.ToString() }));
             }
             catch (ExceptionSimboloEsperado ex)
             {
-                Range rng = new Range(textBoxEditor, (int)ex.token.coluna - ex.token.lexema.Length, (int)ex.token.linha, (int)ex.token.coluna, (int)ex.token.linha);
+                Range rng = new Range(textBoxEditor, (int)ex.token.coluna - ex.token.lexema.Length - 1, (int)ex.token.linha, (int)ex.token.coluna - 1, (int)ex.token.linha);
+                ClearStyles(rng);
                 rng.SetStyle(redStyle);
 
                 listViewError.Items.Add(new ListViewItem(new string[] { ex.token.linha.ToString(), ex.token.coluna.ToString(), "Erro sintatico ExceptionSimboloEsperado: " + ex.ToString() }));
             }
             catch (ExceptionSimboloInesperado ex)
             {
-                Range rng = new Range(textBoxEditor, (int)ex.token.coluna - ex.token.lexema.Length, (int)ex.token.linha , (int)ex.token.coluna, (int)ex.token.linha);
+                Range rng = new Range(textBoxEditor, (int)ex.token.coluna - ex.token.lexema.Length - 1, (int)ex.token.linha , (int)ex.token.coluna - 1, (int)ex.token.linha);
+                ClearStyles(rng);
                 rng.SetStyle(redStyle);
 
                 listViewError.Items.Add(new ListViewItem(new string[] { ex.token.linha.ToString(), ex.token.coluna.ToString(), "Erro sintatico ExceptionSimboloInesperado: " + ex.ToString() }));
@@ -128,57 +122,107 @@ namespace IDE
             analisadorSintatico.arquivo.Close();
         }
 
-        private void textBoxEditor_TextChangedDelayed(object sender, TextChangedEventArgs e)
+        void ClearStyles(Range rng)
+        {
+            rng.ClearStyle(redStyle);
+            rng.ClearStyle(blueStyle);
+            rng.ClearStyle(negritoStyle);
+            rng.ClearStyle(salmonStyle);
+            rng.ClearStyle(grayStyle);
+        }
+
+        void Colorir()
         {
             if (path == null)
                 return;
 
-            {
-                Range rng = new Range(textBoxEditor, 0, 0, textBoxEditor.Lines[textBoxEditor.Lines.Count - 1].Length, textBoxEditor.Lines.Count - 1);
-                rng.ClearStyle(redStyle);
-            }
+            ClearStyles(new Range(textBoxEditor, 0, 0, textBoxEditor.Lines[textBoxEditor.Lines.Count - 1].Length, textBoxEditor.Lines.Count - 1));
 
-            AnalisadorSintatico tmp = new AnalisadorSintatico(path);
+            string pathTmp = path + ".tmp";
 
-            try
-            {
-                listBox1.Items.Clear();
+            if (!File.Exists(pathTmp))
+                File.Create(pathTmp);
 
-                while (!tmp.lexico.FimDeArquivo())
+            File.WriteAllText(pathTmp, textBoxEditor.Text);
+
+            using (StreamReader arquivo = new StreamReader(new FileStream(pathTmp, FileMode.Open)))
+            {                
+                AnalisadorLexico lexico = new AnalisadorLexico(arquivo);
+
+                try
                 {
-                    var token = tmp.lexico.PegaToken();
-                    listBox1.Items.Add(token.linha + " " + token.lexema);
+                    listBox1.Items.Clear();
 
-                    Range rng = new Range(textBoxEditor, (int)token.coluna - token.lexema.Length - 1, (int)token.linha, (int)token.coluna - 1, (int)token.linha);
-
-                    if (token.simbolo == Simbolo.S_PROCEDIMENTO ||
-                        token.simbolo == Simbolo.S_FACA ||
-                        token.simbolo == Simbolo.S_SE ||
-                        token.simbolo == Simbolo.S_SENAO ||
-                        token.simbolo == Simbolo.S_ENTAO ||
-                        token.simbolo == Simbolo.S_VAR ||
-                        token.simbolo == Simbolo.S_ENQUANTO ||
-                        token.simbolo == Simbolo.S_BOOLEANO ||
-                        token.simbolo == Simbolo.S_INTEIRO)
+                    while (!lexico.FimDeArquivo())
                     {
-                        rng.SetStyle(blueStyle);
-                    }
+                        var token = lexico.PegaToken();
+                        listBox1.Items.Add(token.linha + " " + token.lexema);
 
-                    if (token.simbolo == Simbolo.S_INICIO ||
-                        token.simbolo == Simbolo.S_FIM)
-                    {
-                        rng.SetStyle(negritoStyle);
-                    }
+                        Range rng = new Range(textBoxEditor, (int)token.coluna - token.lexema.Length - 1, (int)token.linha, (int)token.coluna - 1, (int)token.linha);
 
-                    if (token.simbolo == Simbolo.S_NUMERO)
-                    {                        
-                        rng.SetStyle(salmonStyle);
+                        if (token.simbolo == Simbolo.S_PROCEDIMENTO ||
+                            token.simbolo == Simbolo.S_PROGRAMA ||
+                            token.simbolo == Simbolo.S_FACA ||
+                            token.simbolo == Simbolo.S_SE ||
+                            token.simbolo == Simbolo.S_SENAO ||
+                            token.simbolo == Simbolo.S_ENTAO ||
+                            token.simbolo == Simbolo.S_VAR ||
+                            token.simbolo == Simbolo.S_ENQUANTO)
+                        {
+                            rng.SetStyle(blueStyle);
+                        }
+
+                        if (token.simbolo == Simbolo.S_INICIO ||
+                            //token.simbolo == Simbolo.S_BOOLEANO ||
+                            //token.simbolo == Simbolo.S_INTEIRO ||
+                            token.simbolo == Simbolo.S_FIM)
+                        {
+                            rng.SetStyle(negritoStyle);
+                        }
+
+                        if (token.simbolo == Simbolo.S_NUMERO)
+                        {
+                            rng.SetStyle(salmonStyle);
+                        }
                     }
                 }
-            }
-            catch { }
+                catch { }
 
-            tmp.arquivo.Close();
+                arquivo.Close();
+            }
+
+            using (StreamReader arquivo = new StreamReader(new FileStream(pathTmp, FileMode.Open)))
+            {                
+                AnalisadorLexico lexico = new AnalisadorLexico(arquivo);
+
+                while (!lexico.FimDeArquivo())
+                {
+                    if (lexico.c == '{')
+                    {
+                        int startL = (int)lexico.linha;
+                        int startC = (int)lexico.coluna - 1;
+                        while (lexico.c != '}' && !lexico.FimDeArquivo())
+                        {
+                            lexico.c = lexico.Ler();
+                        }
+                        int endL = (int)lexico.linha;
+                        int endC = (int)lexico.coluna;
+
+                        Range rng = new Range(textBoxEditor, startC, startL, endC, endL);
+                        ClearStyles(rng);
+                        rng.SetStyle(grayStyle);
+                    }
+
+                    lexico.c = lexico.Ler();
+                }
+
+                arquivo.Close();
+            }
+        }
+
+        private void textBoxEditor_TextChangedDelayed(object sender, TextChangedEventArgs e)
+        {
+            Colorir();
         }
     }
 }

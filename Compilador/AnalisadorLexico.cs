@@ -127,11 +127,10 @@ namespace Compilador
         };
 
         public StreamReader arquivo;
-        ulong linha, coluna;
+        public ulong linha, coluna;
         public char c;
         bool firstTime;
-        bool reachedEndOfFile;
-
+        
         public AnalisadorLexico(StreamReader arquivo)
         {
             this.arquivo = arquivo;
@@ -140,7 +139,6 @@ namespace Compilador
             coluna = 0;
 
             firstTime = true;
-            reachedEndOfFile = false;
         }
 
         public Token PegaToken()
@@ -372,7 +370,7 @@ namespace Compilador
             return false;
         }
 
-        private char Ler()
+        public char Ler()
         {
             if (FimDeArquivo())
             {
