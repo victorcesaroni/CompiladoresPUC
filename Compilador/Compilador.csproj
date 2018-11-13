@@ -38,6 +38,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AnalisadorLexico.cs" />
+    <Compile Include="AnalisadorSemantico.cs" />
     <Compile Include="AnalisadorSintatico.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

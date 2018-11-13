@@ -29,11 +29,13 @@ namespace Compilador
             public bool marca;
         }
 
-        TabelaSimbolo tabelaSimbolo;
+        public TabelaSimbolo tabelaSimbolo;
 
         public class TabelaSimbolo
         {
             public List<SimboloInfo> simbolos;
+            public List<Token> posFixaPilha;
+            public List<Token> posFixa;
 
             public void Insere(List<string> lexemas, SimboloTipo tipo, bool marca)
             {
@@ -81,8 +83,8 @@ namespace Compilador
                 }
             }
 
-            public static Dictionary<string, int> prioridade = new Dictionary<string, int>() {
-                { "u+", 5 },
+            public static Dictionary<Simbolo, int> prioridade = new Dictionary<Simbolo, int>() {
+                /*{ "u+", 5 },
                 { "u-", 5 },
                 { "nao", 5 },
                 { "*", 4 },
@@ -96,16 +98,14 @@ namespace Compilador
                 { "=", 2 },
                 { "!=", 2 },
                 { "e", 1 },
-                { "ou", 0 },
+                { "ou", 0 },*/
+
+                { Simbolo.S_MAIS, 5 },
             };
 
-            public List<string> ParaPosFixa(List<string> expressao)
+            public void ParaPosFixa(Token token, bool unario)
             {
-                List<string> pilha = new List<string>();
-                List<string> posfixa = new List<string>();
-                List<string> expressaoProcessada = new List<string>();
-
-                for (int i = 0; i < expressao.Count; i++)
+                /*for (int i = 0; i < expressao.Count; i++)
                 {
                     string x = expressao[i];
 
@@ -127,15 +127,55 @@ namespace Compilador
                     }
 
                     expressaoProcessada.Add(x);
+                }*/
+
+                if (prioridade.ContainsKey(token.simbolo))
+                {
+                    // é um operando
+                    while (posFixaPilha.Count > 0)
+                    {
+                        int pt = prioridade[token.simbolo];
+                        int pp = prioridade[posFixaPilha[0].simbolo];
+
+                        if (unario)
+                            pp = pt;
+
+                        if (posFixaPilha[0].simbolo != Simbolo.S_ABRE_PARENTESES && pt < pp)
+                        {
+                            posFixa.Add(posFixaPilha[0]);
+                            posFixaPilha.RemoveAt(0);
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+
+                    posFixaPilha.Insert(0, token);
                 }
-               
-                return posfixa;
+                else if (token.simbolo == Simbolo.S_ABRE_PARENTESES)
+                {
+                    posFixaPilha.Insert(0, token);
+                }
+                else if (token.simbolo == Simbolo.S_FECHA_PARENTESES)
+                {
+                    while (posFixaPilha[0].simbolo != Simbolo.S_ABRE_PARENTESES)
+                    {
+                        posFixa.Add(posFixaPilha[0]);
+                        posFixaPilha.RemoveAt(0);
+                    }
+                    posFixaPilha.RemoveAt(0);
+                }
+                else
+                {
+                    posFixa.Add(token);
+                }
             }
         }
 
         public AnalisadorSemantico()
         {
-
+            tabelaSimbolo = new TabelaSimbolo();
         }
     }
 }

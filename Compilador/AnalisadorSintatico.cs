@@ -54,6 +54,7 @@ namespace Compilador
     {
         public StreamReader arquivo;
         public AnalisadorLexico lexico;
+        public AnalisadorSemantico semantico;
 
         Token token = new Token();
 
@@ -61,6 +62,7 @@ namespace Compilador
         {
             arquivo = new StreamReader(new FileStream(caminhoArquivo, FileMode.Open));
             lexico = new AnalisadorLexico(arquivo);
+            semantico = new AnalisadorSemantico();
         }
 
         public void Iniciar()
@@ -291,6 +293,9 @@ namespace Compilador
 
         void AnalisaExpressao()
         {
+            semantico.tabelaSimbolo.posFixaPilha.Clear();
+            semantico.tabelaSimbolo.posFixa.Clear();
+
             AnalisaExpressaoSimples();
 
             if (token.simbolo == Simbolo.S_MAIOR || 
@@ -302,13 +307,26 @@ namespace Compilador
                 Lexico();
                 AnalisaExpressaoSimples();
             }
+
+            // colocar transformacao posfixa em "todos"* os lexicos
+
+            //desempilha tudo
+            while (semantico.tabelaSimbolo.posFixaPilha.Count > 0)
+            {
+                semantico.tabelaSimbolo.posFixa.Add(semantico.tabelaSimbolo.posFixaPilha[0]);
+                semantico.tabelaSimbolo.posFixaPilha.RemoveAt(0);
+            }
+
         }
 
         void AnalisaExpressaoSimples()
         {
             if (token.simbolo == Simbolo.S_MAIS || token.simbolo == Simbolo.S_MENOS)
-                Lexico();                
-            
+            {
+                Lexico();
+                semantico.tabelaSimbolo.ParaPosFixa(token, true);
+            }
+
             AnalisaTermo();
 
             while (token.simbolo == Simbolo.S_MAIS || token.simbolo == Simbolo.S_MENOS || token.simbolo == Simbolo.S_OU)
