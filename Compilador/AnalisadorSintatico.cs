@@ -53,16 +53,20 @@ namespace Compilador
     public class AnalisadorSintatico
     {
         public StreamReader arquivo;
+        public StreamWriter arquivoObjeto;
         public AnalisadorLexico lexico;
         public AnalisadorSemantico semantico;
+        public GeradorCodigo gerador;
 
         Token token = new Token();
 
         public AnalisadorSintatico(string caminhoArquivo)
         {
             arquivo = new StreamReader(new FileStream(caminhoArquivo, FileMode.Open));
+            arquivoObjeto = new StreamWriter(new FileStream(caminhoArquivo + ".obj", FileMode.OpenOrCreate));
             lexico = new AnalisadorLexico(arquivo);
             semantico = new AnalisadorSemantico();
+            gerador = new GeradorCodigo(arquivoObjeto);
         }
 
         public void Iniciar()
@@ -293,8 +297,8 @@ namespace Compilador
 
         void AnalisaExpressao()
         {
-            semantico.tabelaSimbolo.posFixaPilha.Clear();
-            semantico.tabelaSimbolo.posFixa.Clear();
+            semantico.posFixaPilhaAux.Clear();
+            semantico.posFixa.Clear();
 
             AnalisaExpressaoSimples();
 
@@ -311,10 +315,10 @@ namespace Compilador
             // colocar transformacao posfixa em "todos"* os lexicos
 
             //desempilha tudo
-            while (semantico.tabelaSimbolo.posFixaPilha.Count > 0)
+            while (semantico.posFixaPilhaAux.Count > 0)
             {
-                semantico.tabelaSimbolo.posFixa.Add(semantico.tabelaSimbolo.posFixaPilha[0]);
-                semantico.tabelaSimbolo.posFixaPilha.RemoveAt(0);
+                semantico.posFixa.Add(semantico.posFixaPilhaAux[0]);
+                semantico.posFixaPilhaAux.RemoveAt(0);
             }
 
         }
@@ -324,7 +328,7 @@ namespace Compilador
             if (token.simbolo == Simbolo.S_MAIS || token.simbolo == Simbolo.S_MENOS)
             {
                 Lexico();
-                semantico.tabelaSimbolo.ParaPosFixa(token, true);
+                semantico.ParaPosFixa(token, true);
             }
 
             AnalisaTermo();
