@@ -83,13 +83,13 @@ namespace IDE
 
             analisadorSintatico = new AnalisadorSintatico(path);
 
-            try
+            //try
             {
                 analisadorSintatico.Iniciar();
 
                 listViewError.Items.Add(new ListViewItem(new string[] { "0", "0", "Compilacao terminou com sucesso" }));
             }
-            catch (ExceptionErroLexical ex)
+           /* catch (ExceptionErroLexical ex)
             {
                 Range rng = new Range(textBoxEditor, (int)ex.coluna, (int)ex.linha, (int)ex.coluna + 1, (int)ex.linha);
                 ClearStyles(rng);
@@ -107,7 +107,7 @@ namespace IDE
             }
             catch (ExceptionSimboloInesperado ex)
             {
-                Range rng = new Range(textBoxEditor, (int)ex.token.coluna - ex.token.lexema.Length - 1, (int)ex.token.linha , (int)ex.token.coluna - 1, (int)ex.token.linha);
+                Range rng = new Range(textBoxEditor, (int)ex.token.coluna - ex.token.lexema.Length - 1, (int)ex.token.linha, (int)ex.token.coluna - 1, (int)ex.token.linha);
                 ClearStyles(rng);
                 rng.SetStyle(redStyle);
 
@@ -117,7 +117,7 @@ namespace IDE
             catch (Exception ex)
             {
                 listViewError.Items.Add(new ListViewItem(new string[] { "0", "0", ex.Message }));
-            }
+            }*/
 
             analisadorSintatico.arquivo.Close();
         }

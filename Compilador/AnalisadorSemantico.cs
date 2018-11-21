@@ -29,7 +29,7 @@ namespace Compilador
     
     public class TabelaSimbolo
     {
-        public List<SimboloInfo> simbolos;
+        public List<SimboloInfo> simbolos = new List<SimboloInfo>();
 
         public void Insere(List<string> lexemas, SimboloTipo tipo, bool marca)
         {
@@ -80,13 +80,13 @@ namespace Compilador
 
     public class AnalisadorSemantico
     {
-        public TabelaSimbolo tabelaSimbolo;
-        public List<Token> posFixaPilhaAux;
-        public List<Token> posFixa;
+        public TabelaSimbolo tabelaSimbolo = new TabelaSimbolo();
+        public List<Token> posFixaPilhaAux = new List<Token>();
+        public List<Token> posFixa = new List<Token>();
 
         public AnalisadorSemantico()
         {
-            tabelaSimbolo = new TabelaSimbolo();
+
         }
 
         public static Dictionary<Simbolo, int> prioridade = new Dictionary<Simbolo, int>() {
@@ -105,61 +105,24 @@ namespace Compilador
             { "!=", 2 },
             { "e", 1 },
             { "ou", 0 },*/
-
-            { Simbolo.S_MAIS, 5 },
+            { Simbolo.S_NAO, 5 },
+            { Simbolo.S_MULT, 4 },
+            { Simbolo.S_DIV, 4 },
+            { Simbolo.S_MAIS, 3 },
+            { Simbolo.S_MENOS, 3 },
+            { Simbolo.S_MENOR, 2 },
+            { Simbolo.S_MAIOR, 2 },
+            { Simbolo.S_MAIOR_IG, 2 },
+            { Simbolo.S_MENOR_IG, 2 },
+            { Simbolo.S_IG, 2 },
+            { Simbolo.S_DIF, 2 },
+            { Simbolo.S_E, 1 },
+            { Simbolo.S_OU, 0 },
         };
 
-        public void ParaPosFixa(Token token, bool unario)
+        public void ParaPosFixa(Token token)
         {
-            /*for (int i = 0; i < expressao.Count; i++)
-            {
-                string x = expressao[i];
-
-                if (x == "+" || x == "-")
-                {
-                    if (i > 0)
-                    {
-                        if (!(expressao[i - 1][0] >= '0' && expressao[i - 1][0] <= '9' &&
-                            expressao[i - 1][0] >= 'A' && expressao[i - 1][0] <= 'Z' &&
-                            expressao[i - 1][0] >= 'a' && expressao[i - 1][0] <= 'z'))
-                        {
-                            x = "u" + x;
-                        }
-                    }
-                    else if (i == 0)
-                    {
-                        x = "u" + x;
-                    }
-                }
-
-                expressaoProcessada.Add(x);
-            }*/
-
-            if (prioridade.ContainsKey(token.simbolo))
-            {
-                // é um operando
-                while (posFixaPilhaAux.Count > 0)
-                {
-                    int pt = prioridade[token.simbolo];
-                    int pp = prioridade[posFixaPilhaAux[0].simbolo];
-
-                    if (unario)
-                        pp = pt;
-
-                    if (posFixaPilhaAux[0].simbolo != Simbolo.S_ABRE_PARENTESES && pt < pp)
-                    {
-                        posFixa.Add(posFixaPilhaAux[0]);
-                        posFixaPilhaAux.RemoveAt(0);
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-
-                posFixaPilhaAux.Insert(0, token);
-            }
-            else if (token.simbolo == Simbolo.S_ABRE_PARENTESES)
+            if (token.simbolo == Simbolo.S_ABRE_PARENTESES)
             {
                 posFixaPilhaAux.Insert(0, token);
             }
@@ -172,10 +135,48 @@ namespace Compilador
                 }
                 posFixaPilhaAux.RemoveAt(0);
             }
+            else if (prioridade.ContainsKey(token.simbolo))
+            {
+                // é um operando
+                while (posFixaPilhaAux.Count > 0)
+                {
+                    if (posFixaPilhaAux[0].simbolo != Simbolo.S_ABRE_PARENTESES && prioridade[token.simbolo] < prioridade[posFixaPilhaAux[0].simbolo])
+                    {
+                        posFixa.Add(posFixaPilhaAux[0]);
+                        posFixaPilhaAux.RemoveAt(0);
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+
+                posFixaPilhaAux.Insert(0, token);
+            }           
             else
             {
                 posFixa.Add(token);
             }
+        }
+
+        public void ReinicializaPosFixa()
+        {
+            posFixaPilhaAux.Clear();
+            posFixa.Clear();
+        }
+
+        public void FinalizaPosFixa()
+        {
+            //desempilha tudo
+            while (posFixaPilhaAux.Count > 0)
+            {
+                posFixa.Add(posFixaPilhaAux[0]);
+                posFixaPilhaAux.RemoveAt(0);
+            }
+
+            for (int i = 0; i < posFixa.Count; i++)
+                System.Diagnostics.Debug.Write(posFixa[i].lexema);
+            System.Diagnostics.Debug.WriteLine("");
         }
     }
 }

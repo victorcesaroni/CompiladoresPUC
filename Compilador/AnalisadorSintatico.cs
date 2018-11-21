@@ -69,6 +69,11 @@ namespace Compilador
             gerador = new GeradorCodigo(arquivoObjeto);
         }
 
+        ~AnalisadorSintatico()
+        {
+            Finalizar();
+        }
+
         public void Iniciar()
         {
             /*try
@@ -101,6 +106,7 @@ namespace Compilador
         public void Finalizar()
         {
             arquivo.Close();
+            arquivoObjeto.Close();
         }
 
         public void Analisa()
@@ -267,13 +273,17 @@ namespace Compilador
             Lexico();
             ChecaSimboloInesperado(Simbolo.S_ATRIBUICAO);
             Lexico();*/
+            semantico.ReinicializaPosFixa();
             AnalisaExpressao();
+            semantico.FinalizaPosFixa();
         }
 
         void AnalisaSe()
         {
             Lexico();
+            semantico.ReinicializaPosFixa();
             AnalisaExpressao();
+            semantico.FinalizaPosFixa();
             ChecaSimboloEsperado(Simbolo.S_ENTAO);
             Lexico();
             AnalisaComandoSimples();
@@ -287,7 +297,9 @@ namespace Compilador
         void AnalisaEnquanto()
         {
             Lexico();
+            semantico.ReinicializaPosFixa();
             AnalisaExpressao();
+            semantico.FinalizaPosFixa();
 
             ChecaSimboloEsperado(Simbolo.S_FACA);
 
@@ -297,9 +309,6 @@ namespace Compilador
 
         void AnalisaExpressao()
         {
-            semantico.posFixaPilhaAux.Clear();
-            semantico.posFixa.Clear();
-
             AnalisaExpressaoSimples();
 
             if (token.simbolo == Simbolo.S_MAIOR || 
@@ -308,33 +317,31 @@ namespace Compilador
                 token.simbolo == Simbolo.S_MENOR_IG || 
                 token.simbolo == Simbolo.S_DIF)
             {
+                semantico.ParaPosFixa(token);
                 Lexico();
                 AnalisaExpressaoSimples();
             }
-
-            // colocar transformacao posfixa em "todos"* os lexicos
-
-            //desempilha tudo
-            while (semantico.posFixaPilhaAux.Count > 0)
-            {
-                semantico.posFixa.Add(semantico.posFixaPilhaAux[0]);
-                semantico.posFixaPilhaAux.RemoveAt(0);
-            }
-
         }
 
         void AnalisaExpressaoSimples()
         {
-            if (token.simbolo == Simbolo.S_MAIS || token.simbolo == Simbolo.S_MENOS)
+            if (token.simbolo == Simbolo.S_MAIS)
             {
                 Lexico();
-                semantico.ParaPosFixa(token, true);
+            }
+
+            if (token.simbolo == Simbolo.S_MENOS)
+            {
+                semantico.ParaPosFixa(new Token(Simbolo.S_NUMERO, "0", 0, 0));
+                semantico.ParaPosFixa(token);
+                Lexico();
             }
 
             AnalisaTermo();
 
             while (token.simbolo == Simbolo.S_MAIS || token.simbolo == Simbolo.S_MENOS || token.simbolo == Simbolo.S_OU)
             {
+                semantico.ParaPosFixa(token);
                 Lexico();
                 AnalisaTermo();
             }
@@ -342,6 +349,8 @@ namespace Compilador
 
         void AnalisaFator()
         {
+            semantico.ParaPosFixa(token);
+
             if (token.simbolo == Simbolo.S_IDENTIFICADOR)
             {
                 AnalisaChamadaFuncao();
@@ -360,6 +369,7 @@ namespace Compilador
                 Lexico();
                 AnalisaExpressao();
                 ChecaSimboloEsperado(Simbolo.S_FECHA_PARENTESES);
+                semantico.ParaPosFixa(token);
                 Lexico();
             }
             else if (token.lexema == "verdadeiro" || token.lexema == "falso")
@@ -381,6 +391,7 @@ namespace Compilador
 
             while (token.simbolo == Simbolo.S_MULT || token.simbolo == Simbolo.S_DIV || token.simbolo == Simbolo.S_E)
             {
+                semantico.ParaPosFixa(token);
                 Lexico();
                 AnalisaFator();
             }
