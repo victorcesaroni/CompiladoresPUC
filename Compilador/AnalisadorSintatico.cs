@@ -276,37 +276,56 @@ namespace Compilador
 
         void AnalisaAtribChProcedimento()
         {
+            Token old = token;
+
             Lexico();
             if (token.simbolo == Simbolo.S_ATRIBUICAO)
-                AnalisaAtribuicao(); // ja leu um identificador?
+                AnalisaAtribuicao(old); // ja leu um identificador?
             else
-                ChamadaProcedimento();
+                ChamadaProcedimento(old);
         }
 
-        void ChamadaProcedimento()
+        void ChamadaProcedimento(Token old)
         {
+            SimboloInfo simbolo = semantico.tabelaSimbolo.Pesquisa(old.lexema);
+
+            if (simbolo == null)
+                throw new ExceptionVariavelNaoDeclarada("", token);
+
             //Lexico();
             //ChecaSimboloEsperado(Simbolo.S_IDENTIFICADOR);
            // Lexico();
         }
 
-        void AnalisaAtribuicao()
+        void AnalisaAtribuicao(Token old)
         {
+            SimboloInfo simbolo = semantico.tabelaSimbolo.Pesquisa(old.lexema);
+
+            if (simbolo == null)
+                throw new ExceptionVariavelNaoDeclarada("", token);
+
+
             Lexico();
             /*ChecaSimboloEsperado(Simbolo.S_IDENTIFICADOR);
             Lexico();
             ChecaSimboloInesperado(Simbolo.S_ATRIBUICAO);
             Lexico();*/
             semantico.ReinicializaPosFixa();
-            AnalisaExpressao();
+            SimboloTipo tipo2 = AnalisaExpressao();
+            if(!MesmoTipo(simbolo.tipo,tipo2))
+                throw new ExceptionTipoInvalido("", simbolo.tipo, tipo2, old); 
+
             semantico.FinalizaPosFixa();
         }
 
         void AnalisaSe()
         {
+            Token old = token;
             Lexico();
             semantico.ReinicializaPosFixa();
-            AnalisaExpressao();
+            SimboloTipo tipo = AnalisaExpressao();
+            if (!MesmoTipo(tipo, SimboloTipo.BOOLEANO))
+                throw new ExceptionTipoInvalido("", SimboloTipo.BOOLEANO, tipo, old); 
             semantico.FinalizaPosFixa();
             ChecaSimboloEsperado(Simbolo.S_ENTAO);
             Lexico();
@@ -331,10 +350,10 @@ namespace Compilador
             AnalisaComandoSimples();
         }
 
-        void AnalisaExpressao()
+        SimboloTipo AnalisaExpressao()
         {
-            AnalisaExpressaoSimples();
-
+            SimboloTipo tipo1 = AnalisaExpressaoSimples();
+          
             if (token.simbolo == Simbolo.S_MAIOR || 
                 token.simbolo == Simbolo.S_MENOR || 
                 token.simbolo == Simbolo.S_MAIOR_IG || 
@@ -343,11 +362,27 @@ namespace Compilador
             {
                 semantico.ParaPosFixa(token);
                 Lexico();
-                AnalisaExpressaoSimples();
+                SimboloTipo tipo2 = AnalisaExpressaoSimples();
+
+                if (!MesmoTipo(tipo1, tipo2))
+                    throw new ExceptionTipoInvalido("", tipo1, tipo2, token);              
+                return SimboloTipo.BOOLEANO;
             }
+
+            return tipo1;
+
         }
 
-        void AnalisaExpressaoSimples()
+        bool MesmoTipo(SimboloTipo tipo1, SimboloTipo tipo2)
+        {
+            if (tipo1 == SimboloTipo.INTEIRO || tipo1 == SimboloTipo.FUNCAO_INTEIRO)
+                return tipo2 == SimboloTipo.INTEIRO || tipo2 == SimboloTipo.FUNCAO_INTEIRO;
+            else if (tipo1 == SimboloTipo.BOOLEANO || tipo1 == SimboloTipo.FUNCAO_BOOLEANO)
+                return tipo2 == SimboloTipo.BOOLEANO || tipo2 == SimboloTipo.FUNCAO_BOOLEANO;
+            return false;
+        }
+
+        SimboloTipo AnalisaExpressaoSimples()
         {
             if (token.simbolo == Simbolo.S_MAIS)
             {
@@ -361,64 +396,114 @@ namespace Compilador
                 Lexico();
             }
 
-            AnalisaTermo();
+            SimboloTipo tipo1 = AnalisaTermo();
 
             while (token.simbolo == Simbolo.S_MAIS || token.simbolo == Simbolo.S_MENOS || token.simbolo == Simbolo.S_OU)
             {
                 semantico.ParaPosFixa(token);
+                Token old = token;      
                 Lexico();
-                AnalisaTermo();
+                SimboloTipo tipo2 = AnalisaTermo();
+
+                if (old.simbolo == Simbolo.S_MAIS || old.simbolo == Simbolo.S_MENOS)
+                {
+                    if (!MesmoTipo(tipo1, SimboloTipo.INTEIRO))
+                        throw new ExceptionTipoInvalido("", SimboloTipo.INTEIRO, tipo1, old);
+                    if (!MesmoTipo(tipo2, SimboloTipo.INTEIRO))
+                        throw new ExceptionTipoInvalido("", SimboloTipo.INTEIRO, tipo2, old);
+                    return SimboloTipo.INTEIRO;
+                }
+                else if (old.simbolo == Simbolo.S_OU)
+                {
+                    if (!MesmoTipo(tipo1, SimboloTipo.BOOLEANO))
+                        throw new ExceptionTipoInvalido("", SimboloTipo.BOOLEANO, tipo1, old);
+                    if (!MesmoTipo(tipo2, SimboloTipo.BOOLEANO))
+                        throw new ExceptionTipoInvalido("", SimboloTipo.BOOLEANO, tipo2, old);
+                    return SimboloTipo.BOOLEANO;
+                }
             }
+
+            return tipo1;
         }
 
-        void AnalisaFator()
+        SimboloTipo AnalisaFator()
         {
             semantico.ParaPosFixa(token);
 
             if (token.simbolo == Simbolo.S_IDENTIFICADOR)
             {
-                AnalisaChamadaFuncao();
+                return AnalisaChamadaFuncao();
             }
             else if (token.simbolo == Simbolo.S_NUMERO)
             {
                 Lexico();
+                return SimboloTipo.INTEIRO;
             }
             else if (token.simbolo == Simbolo.S_NAO)
             {
                 Lexico();
-                AnalisaFator();
+                return AnalisaFator();
             }
             else if (token.simbolo == Simbolo.S_ABRE_PARENTESES)
             {
                 Lexico();
-                AnalisaExpressao();
+                SimboloTipo tipo = AnalisaExpressao();
                 ChecaSimboloEsperado(Simbolo.S_FECHA_PARENTESES);
                 semantico.ParaPosFixa(token);
                 Lexico();
+                return tipo;
             }
             else if (token.lexema == "verdadeiro" || token.lexema == "falso")
             {
                 Lexico();
+                return SimboloTipo.BOOLEANO;
             }
             else throw new ExceptionSimboloInesperado("", token);
         }
 
-        void AnalisaChamadaFuncao()
+        SimboloTipo AnalisaChamadaFuncao()
         {
             ChecaSimboloEsperado(Simbolo.S_IDENTIFICADOR);
+
+            SimboloInfo simbolo = semantico.tabelaSimbolo.Pesquisa(token.lexema);
+
+            if (simbolo == null)
+                throw new ExceptionVariavelNaoDeclarada("", token);
+
             Lexico();
+            return simbolo.tipo;
         }
 
-        void AnalisaTermo()
+        SimboloTipo AnalisaTermo()
         {
-            AnalisaFator();
+            SimboloTipo tipo1 = AnalisaFator();
 
             while (token.simbolo == Simbolo.S_MULT || token.simbolo == Simbolo.S_DIV || token.simbolo == Simbolo.S_E)
             {
                 semantico.ParaPosFixa(token);
+                Token old = token;      
                 Lexico();
-                AnalisaFator();
+                SimboloTipo tipo2 = AnalisaFator();
+
+                if (old.simbolo == Simbolo.S_MULT || old.simbolo == Simbolo.S_DIV)
+                {
+                    if (!MesmoTipo(tipo1, SimboloTipo.INTEIRO))
+                        throw new ExceptionTipoInvalido("", SimboloTipo.INTEIRO, tipo1, old);
+                    if (!MesmoTipo(tipo2, SimboloTipo.INTEIRO))
+                        throw new ExceptionTipoInvalido("", SimboloTipo.INTEIRO, tipo2, old);
+                    return SimboloTipo.INTEIRO;
+                }
+                else if (old.simbolo == Simbolo.S_E)
+                {
+                    if (!MesmoTipo(tipo1, SimboloTipo.BOOLEANO))
+                        throw new ExceptionTipoInvalido("", SimboloTipo.BOOLEANO, tipo1, old);
+                    if (!MesmoTipo(tipo2, SimboloTipo.BOOLEANO))
+                        throw new ExceptionTipoInvalido("", SimboloTipo.BOOLEANO, tipo2, old);
+                    return SimboloTipo.BOOLEANO;
+                }
             }
+
+            return tipo1;
         }
 
         void AnalisaLeia()
@@ -446,7 +531,7 @@ namespace Compilador
             if (!semantico.tabelaSimbolo.PesquisaVariavelInteiro(token.lexema) &&
                 !semantico.tabelaSimbolo.PesquisaFuncaoInteiro(token.lexema))
             {
-                SimboloInfo s = semantico.tabelaSimbolo.PesquisaVariavel(token.lexema);
+                SimboloInfo s = semantico.tabelaSimbolo.Pesquisa(token.lexema);
 
                 if (s != null)
                     throw new ExceptionTipoInvalido("", SimboloTipo.INTEIRO, s.tipo, token);
