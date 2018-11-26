@@ -33,6 +33,7 @@ namespace Compilador
         }
     }
 
+
     public class ExceptionSimboloInesperado : Exception
     {
         public Token token;
@@ -115,6 +116,7 @@ namespace Compilador
             ChecaSimboloEsperado(Simbolo.S_PROGRAMA);
             Lexico();
             ChecaSimboloEsperado(Simbolo.S_IDENTIFICADOR);
+            semantico.tabelaSimbolo.Insere(new List<string> { token.lexema }, SimboloTipo.PROCEDIMENTO, true);
             Lexico();
             ChecaSimboloEsperado(Simbolo.S_PONTO_VIRGULA);
             AnalisaBloco();
@@ -172,6 +174,12 @@ namespace Compilador
         {
             Lexico();
             ChecaSimboloEsperado(Simbolo.S_IDENTIFICADOR);
+
+            if (semantico.tabelaSimbolo.PesquisaDuplicidade(token.lexema))
+                throw new ExceptionVariavelDuplicada("", token);
+
+            string tmp = token.lexema;
+            
             Lexico();
             ChecaSimboloEsperado(Simbolo.S_DOIS_PONTOS);
             Lexico();
@@ -179,18 +187,34 @@ namespace Compilador
             if (token.simbolo != Simbolo.S_INTEIRO && token.simbolo != Simbolo.S_BOOLEANO)
                 throw new ExceptionSimboloInesperado("", token);
 
+            if (token.simbolo == Simbolo.S_INTEIRO)
+                semantico.tabelaSimbolo.Insere(new List<string> { tmp }, SimboloTipo.FUNCAO_INTEIRO, true);
+            else if (token.simbolo == Simbolo.S_BOOLEANO)
+                semantico.tabelaSimbolo.Insere(new List<string> { tmp }, SimboloTipo.FUNCAO_BOOLEANO, true);
+
             Lexico();
             if (token.simbolo == Simbolo.S_PONTO_VIRGULA)
+            {
                 AnalisaBloco();
+            }
+            semantico.tabelaSimbolo.VoltaNivel();
         }
 
         void AnalisaDeclaracaoProcedimento()
         {
             Lexico();
             ChecaSimboloEsperado(Simbolo.S_IDENTIFICADOR);
+
+            if (semantico.tabelaSimbolo.PesquisaDuplicidade(token.lexema))
+                throw new ExceptionVariavelDuplicada("", token);
+
+            semantico.tabelaSimbolo.Insere(new List<string> { token.lexema }, SimboloTipo.PROCEDIMENTO, true);
+
             Lexico();
             ChecaSimboloEsperado(Simbolo.S_PONTO_VIRGULA);
             AnalisaBloco();
+
+            semantico.tabelaSimbolo.VoltaNivel();
         }
 
         void AnalisaComandos()
@@ -403,6 +427,10 @@ namespace Compilador
             ChecaSimboloEsperado(Simbolo.S_ABRE_PARENTESES);
             Lexico();
             ChecaSimboloEsperado(Simbolo.S_IDENTIFICADOR);
+
+            if (!semantico.tabelaSimbolo.PesquisaVariavelInteiro(token.lexema))
+                throw new ExceptionVariavelNaoDeclarada("", token);
+
             Lexico();
             ChecaSimboloEsperado(Simbolo.S_FECHA_PARENTESES);
             Lexico();
@@ -414,6 +442,18 @@ namespace Compilador
             ChecaSimboloEsperado(Simbolo.S_ABRE_PARENTESES);
             Lexico();
             ChecaSimboloEsperado(Simbolo.S_IDENTIFICADOR);
+
+            if (!semantico.tabelaSimbolo.PesquisaVariavelInteiro(token.lexema) &&
+                !semantico.tabelaSimbolo.PesquisaFuncaoInteiro(token.lexema))
+            {
+                SimboloInfo s = semantico.tabelaSimbolo.PesquisaVariavel(token.lexema);
+
+                if (s != null)
+                    throw new ExceptionTipoInvalido("", SimboloTipo.INTEIRO, s.tipo, token);
+                else
+                    throw new ExceptionVariavelNaoDeclarada("", token);
+            }
+
             Lexico();
             ChecaSimboloEsperado(Simbolo.S_FECHA_PARENTESES);
             Lexico();
@@ -421,9 +461,17 @@ namespace Compilador
 
         void AnalisaVariaveis()
         {
+            List<string> tmp = new List<string>();
+
             do
             {
                 ChecaSimboloEsperado(Simbolo.S_IDENTIFICADOR);
+
+                if (semantico.tabelaSimbolo.PesquisaDuplicidadeNoEscopo(token.lexema) ||
+                    semantico.tabelaSimbolo.PesquisaDuplicidadeProcedimentoFuncao(token.lexema))
+                    throw new ExceptionVariavelDuplicada("", token);
+
+                tmp.Add(token.lexema);
 
                 Lexico();
                 if (token.simbolo == Simbolo.S_VIRGULA || token.simbolo == Simbolo.S_DOIS_PONTOS)
@@ -440,13 +488,18 @@ namespace Compilador
             } while (token.simbolo != Simbolo.S_DOIS_PONTOS);
 
             Lexico();
-            AnalisaTipo();
+            AnalisaTipo(tmp);
         }
 
-        void AnalisaTipo()
+        void AnalisaTipo(List<string> listaDeVar)
         {
             if (token.simbolo != Simbolo.S_INTEIRO && token.simbolo != Simbolo.S_BOOLEANO)
                 throw new ExceptionSimboloInesperado("", token);
+
+            if (token.simbolo == Simbolo.S_INTEIRO)
+                semantico.tabelaSimbolo.Insere(listaDeVar, SimboloTipo.INTEIRO, false);
+            else if (token.simbolo == Simbolo.S_BOOLEANO)
+                semantico.tabelaSimbolo.Insere(listaDeVar, SimboloTipo.BOOLEANO, false);
 
             Lexico();
         }

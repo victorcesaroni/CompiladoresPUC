@@ -1,0 +1,16 @@
+programa A;
+var a,b : inteiro;
+    c : booleano;
+
+procedimento B;
+var a,b : inteiro;
+inicio
+    a:=b;
+    escreva(a);
+fim;
+
+inicio
+    a:=B+C;
+    escreva(b);
+    escreva(c);
+fim.

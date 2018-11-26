@@ -4,6 +4,59 @@ using System.IO;
 
 namespace Compilador
 {
+    public class ExceptionVariavelDuplicada : Exception
+    {
+        public Token token;
+        public string info;
+
+        public ExceptionVariavelDuplicada(string info, Token token)
+        {
+            this.token = token;
+            this.info = info;
+        }
+
+        public override string ToString()
+        {
+            return info + " " + "Variável '" + token.lexema + "'já declarada";
+        }
+    }
+    public class ExceptionVariavelNaoDeclarada : Exception
+    {
+        public Token token;
+        public string info;
+
+        public ExceptionVariavelNaoDeclarada(string info, Token token)
+        {
+            this.token = token;
+            this.info = info;
+        }
+
+        public override string ToString()
+        {
+            return info + " " + "Variável '" + token.lexema + "' usada mas não declarada";
+        }
+    }
+    public class ExceptionTipoInvalido : Exception
+    {
+        public Token token;
+        public string info;
+        public SimboloTipo esperado;
+        public SimboloTipo recebido;
+
+        public ExceptionTipoInvalido(string info, SimboloTipo esperado, SimboloTipo recebido, Token token)
+        {
+            this.token = token;
+            this.info = info;
+            this.recebido = recebido;
+            this.recebido = recebido;
+        }
+
+        public override string ToString()
+        {
+            return info + " " + "Esperava o tipo '" + esperado.ToString() + "' mas recebeu '" + recebido.ToString() + "' no token '" + token.lexema + "' ";
+        }
+    }
+
     public enum SimboloTipo
     {
         INTEIRO,
@@ -39,7 +92,7 @@ namespace Compilador
             }
         }
 
-        public bool PesquisaDuplicidadeVariavel(string lexema)
+        public bool PesquisaDuplicidadeNoEscopo(string lexema)
         {
             for (int i = simbolos.Count - 1; i >= 0; i--)
             {
@@ -55,7 +108,53 @@ namespace Compilador
         {
             for (int i = simbolos.Count - 1; i >= 0; i--)
             {
+                if (simbolos[i].lexema == lexema &&
+                    simbolos[i].tipo == SimboloTipo.PROCEDIMENTO ||
+                    simbolos[i].tipo == SimboloTipo.FUNCAO_INTEIRO ||
+                    simbolos[i].tipo == SimboloTipo.FUNCAO_BOOLEANO)
+                    return true;
+            }
+            return false;
+        }
+
+        public bool PesquisaDuplicidade(string lexema)
+        {
+            for (int i = simbolos.Count - 1; i >= 0; i--)
+            {
                 if (simbolos[i].lexema == lexema)
+                    return true;
+            }
+            return false;
+        }
+
+
+        public bool PesquisaVariavelInteiro(string lexema)
+        {
+            for (int i = simbolos.Count - 1; i >= 0; i--)
+            {
+                if (simbolos[i].lexema == lexema && 
+                    simbolos[i].tipo == SimboloTipo.INTEIRO)
+                    return true;
+            }
+            return false;
+        }
+
+        public SimboloInfo PesquisaVariavel(string lexema)
+        {
+            for (int i = simbolos.Count - 1; i >= 0; i--)
+            {
+                if (simbolos[i].lexema == lexema)
+                    return simbolos[i];
+            }
+            return null;
+        }
+
+        public bool PesquisaFuncaoInteiro(string lexema)
+        {
+            for (int i = simbolos.Count - 1; i >= 0; i--)
+            {
+                if (simbolos[i].lexema == lexema &&
+                    simbolos[i].tipo == SimboloTipo.FUNCAO_INTEIRO)
                     return true;
             }
             return false;

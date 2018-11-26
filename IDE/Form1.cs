@@ -83,13 +83,13 @@ namespace IDE
 
             analisadorSintatico = new AnalisadorSintatico(path);
 
-            //try
+            try
             {
                 analisadorSintatico.Iniciar();
 
                 listViewError.Items.Add(new ListViewItem(new string[] { "0", "0", "Compilacao terminou com sucesso" }));
             }
-           /* catch (ExceptionErroLexical ex)
+            catch (ExceptionErroLexical ex)
             {
                 Range rng = new Range(textBoxEditor, (int)ex.coluna, (int)ex.linha, (int)ex.coluna + 1, (int)ex.linha);
                 ClearStyles(rng);
@@ -114,12 +114,37 @@ namespace IDE
                 listViewError.Items.Add(new ListViewItem(new string[] { ex.token.linha.ToString(), ex.token.coluna.ToString(), "Erro sintatico ExceptionSimboloInesperado: " + ex.ToString() }));
 
             }
+            catch (ExceptionVariavelNaoDeclarada ex)
+            {
+                Range rng = new Range(textBoxEditor, (int)ex.token.coluna - ex.token.lexema.Length - 1, (int)ex.token.linha, (int)ex.token.coluna - 1, (int)ex.token.linha);
+                ClearStyles(rng);
+                rng.SetStyle(redStyle);
+
+                listViewError.Items.Add(new ListViewItem(new string[] { ex.token.linha.ToString(), ex.token.coluna.ToString(), "Erro semantico ExceptionVariavelNaoDeclarada: " + ex.ToString() }));
+
+            }
+            catch (ExceptionVariavelDuplicada ex)
+            {
+                Range rng = new Range(textBoxEditor, (int)ex.token.coluna - ex.token.lexema.Length - 1, (int)ex.token.linha, (int)ex.token.coluna - 1, (int)ex.token.linha);
+                ClearStyles(rng);
+                rng.SetStyle(redStyle);
+
+                listViewError.Items.Add(new ListViewItem(new string[] { ex.token.linha.ToString(), ex.token.coluna.ToString(), "Erro semantico ExceptionVariavelNaoDeclarada: " + ex.ToString() }));
+            }
+            catch(ExceptionTipoInvalido ex)
+            {
+                Range rng = new Range(textBoxEditor, (int)ex.token.coluna - ex.token.lexema.Length - 1, (int)ex.token.linha, (int)ex.token.coluna - 1, (int)ex.token.linha);
+                ClearStyles(rng);
+                rng.SetStyle(redStyle);
+
+                listViewError.Items.Add(new ListViewItem(new string[] { ex.token.linha.ToString(), ex.token.coluna.ToString(), "Erro semantico ExceptionTipoInvalido: " + ex.ToString() }));
+            }
             catch (Exception ex)
             {
                 listViewError.Items.Add(new ListViewItem(new string[] { "0", "0", ex.Message }));
-            }*/
+            }
 
-            analisadorSintatico.arquivo.Close();
+            analisadorSintatico.Finalizar();
         }
 
         void ClearStyles(Range rng)
@@ -151,12 +176,12 @@ namespace IDE
 
                 try
                 {
-                    listBox1.Items.Clear();
+                    //listBox1.Items.Clear();
 
                     while (!lexico.FimDeArquivo())
                     {
                         var token = lexico.PegaToken();
-                        listBox1.Items.Add(token.linha + " " + token.lexema);
+                        //listBox1.Items.Add(token.linha + " " + token.lexema);
 
                         Range rng = new Range(textBoxEditor, (int)token.coluna - token.lexema.Length - 1, (int)token.linha, (int)token.coluna - 1, (int)token.linha);
 
