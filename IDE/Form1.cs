@@ -20,7 +20,10 @@ namespace IDE
         Style blueStyle = new TextStyle(Brushes.Blue, Brushes.White, FontStyle.Bold);
         Style negritoStyle = new TextStyle(Brushes.Black, Brushes.White, FontStyle.Bold);
         Style salmonStyle = new TextStyle(Brushes.Salmon, Brushes.White, FontStyle.Regular);
-        Style grayStyle = new TextStyle(Brushes.LightGray, Brushes.White, FontStyle.Bold);
+        Style grayStyle = new TextStyle(Brushes.DarkGray, Brushes.White, FontStyle.Bold);
+        Style blueNormalStyle = new TextStyle(Brushes.Blue, Brushes.White, FontStyle.Regular);
+        Style salmonItallicStyle = new TextStyle(Brushes.Salmon, Brushes.White, FontStyle.Regular | FontStyle.Italic);
+        Style blackItallicStyle = new TextStyle(Brushes.Black, Brushes.White, FontStyle.Regular | FontStyle.Italic);
         
         AnalisadorSintatico analisadorSintatico = null;
         string path = null;
@@ -130,7 +133,7 @@ namespace IDE
                 ClearStyles(rng);
                 rng.SetStyle(redStyle);
 
-                listViewError.Items.Add(new ListViewItem(new string[] { ex.token.linha.ToString(), ex.token.coluna.ToString(), "Erro semantico ExceptionVariavelNaoDeclarada: " + ex.ToString() }));
+                listViewError.Items.Add(new ListViewItem(new string[] { ex.token.linha.ToString(), ex.token.coluna.ToString(), "Erro semantico ExceptionVariavelDuplicada: " + ex.ToString() }));
             }
             catch(ExceptionTipoInvalido ex)
             {
@@ -139,6 +142,14 @@ namespace IDE
                 rng.SetStyle(redStyle);
 
                 listViewError.Items.Add(new ListViewItem(new string[] { ex.token.linha.ToString(), ex.token.coluna.ToString(), "Erro semantico ExceptionTipoInvalido: " + ex.ToString() }));
+            }
+            catch (ExceptionRetornoDeFuncaoInesperado ex)
+            {
+                Range rng = new Range(textBoxEditor, (int)ex.token.coluna - ex.token.lexema.Length - 1, (int)ex.token.linha, (int)ex.token.coluna - 1, (int)ex.token.linha);
+                ClearStyles(rng);
+                rng.SetStyle(redStyle);
+
+                listViewError.Items.Add(new ListViewItem(new string[] { ex.token.linha.ToString(), ex.token.coluna.ToString(), "Erro semantico ExceptionRetornoDeFuncaoInesperado: " + ex.ToString() }));
             }
             catch (Exception ex)
             {
@@ -200,8 +211,6 @@ namespace IDE
                         }
 
                         if (token.simbolo == Simbolo.S_INICIO ||
-                            //token.simbolo == Simbolo.S_BOOLEANO ||
-                            //token.simbolo == Simbolo.S_INTEIRO ||
                             token.simbolo == Simbolo.S_FIM)
                         {
                             rng.SetStyle(negritoStyle);
@@ -210,6 +219,22 @@ namespace IDE
                         if (token.simbolo == Simbolo.S_NUMERO)
                         {
                             rng.SetStyle(salmonStyle);
+                        }
+                                         
+                        if (token.simbolo == Simbolo.S_VERDADEIRO ||
+                           token.simbolo == Simbolo.S_FALSO)
+                        {
+                            rng.SetStyle(salmonStyle);
+                        }
+
+                        if (token.simbolo == Simbolo.S_BOOLEANO ||
+                            token.simbolo == Simbolo.S_INTEIRO ||
+                            token.simbolo == Simbolo.S_E ||
+                            token.simbolo == Simbolo.S_OU ||
+                            token.simbolo == Simbolo.S_NAO ||
+                            token.simbolo == Simbolo.S_DIV)
+                        {
+                            rng.SetStyle(blackItallicStyle);
                         }
                     }
                 }

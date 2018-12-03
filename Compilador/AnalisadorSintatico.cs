@@ -51,6 +51,23 @@ namespace Compilador
         }
     }
 
+    public class ExceptionRetornoDeFuncaoInesperado : Exception
+    {
+        public Token token;
+        public string info;
+
+        public ExceptionRetornoDeFuncaoInesperado(string info, Token token)
+        {
+            this.token = token;
+            this.info = info;
+        }
+
+        public override string ToString()
+        {
+            return info + " " + "Retorno de função inesperado '" + token.lexema + "'";
+        }
+    }
+
     public class AnalisadorSintatico
     {
         public StreamReader arquivo;
@@ -116,7 +133,11 @@ namespace Compilador
             ChecaSimboloEsperado(Simbolo.S_PROGRAMA);
             Lexico();
             ChecaSimboloEsperado(Simbolo.S_IDENTIFICADOR);
-            semantico.tabelaSimbolo.Insere(new List<string> { token.lexema }, SimboloTipo.PROCEDIMENTO, true);
+            semantico.tabelaSimbolo.Insere(new List<string> { token.lexema }, SimboloTipo.PROGRAMA, true);
+
+            gerador.START();
+            gerador.JMP(semantico.tabelaSimbolo.simbolos[0].lexema);
+
             Lexico();
             ChecaSimboloEsperado(Simbolo.S_PONTO_VIRGULA);
             AnalisaBloco();
@@ -125,6 +146,8 @@ namespace Compilador
             Lexico();
             if (token.simbolo != Simbolo.S_FINAL_DE_ARQUIVO)
                 throw new ExceptionSimboloInesperado("Inesperado apos final de programa", token);
+            
+            gerador.HLT();
         }
 
         void AnalisaBloco()
@@ -132,6 +155,50 @@ namespace Compilador
             Lexico();
             AnalisaEtapaDeclaracaoVariaveis();
             AnalisaSubRotinas();
+
+            SimboloInfo escopo = semantico.tabelaSimbolo.PesquisaEscopo();
+
+            if (escopo != null)
+            {
+                if (escopo.tipo == SimboloTipo.PROGRAMA)
+                {
+                    string nome = escopo.lexema;
+                    int count = semantico.tabelaSimbolo.NumeroDeVariaveisAlocadas();
+
+                    gerador.NULL(nome, "inicio do programa " + nome);
+
+                    if (count > 0)
+                    {
+                        gerador.ALLOC(0.ToString(), count.ToString());
+                    }
+                }
+                if (escopo.tipo == SimboloTipo.FUNCAO_BOOLEANO || escopo.tipo == SimboloTipo.FUNCAO_INTEIRO)
+                {
+                    string nome = escopo.lexema;
+                    int count = semantico.tabelaSimbolo.NumeroDeVariaveisAlocadas();
+
+                    //TODO: pesquisar endereco
+                    gerador.NULL(nome, "inicio da funcao " + nome + ":" + escopo.tipo.ToString());
+
+                    if (count > 0)
+                    {
+                        gerador.ALLOC(0.ToString(), count.ToString());
+                    }
+                }
+                if (escopo.tipo == SimboloTipo.PROCEDIMENTO)
+                {
+                    string nome = escopo.lexema;
+                    int count = semantico.tabelaSimbolo.NumeroDeVariaveisAlocadas();
+
+                    //TODO: pesquisar endereco
+                    gerador.NULL(nome, "inicio do procedimento " + nome);
+
+                    if (count > 0)
+                    {
+                        gerador.ALLOC(0.ToString(), count.ToString());
+                    }
+                }
+            }
             AnalisaComandos();
         }
 
@@ -175,9 +242,11 @@ namespace Compilador
             Lexico();
             ChecaSimboloEsperado(Simbolo.S_IDENTIFICADOR);
 
-            if (semantico.tabelaSimbolo.PesquisaDuplicidade(token.lexema))
-                throw new ExceptionVariavelDuplicada("", token);
+            Token old = token;
 
+            if (semantico.tabelaSimbolo.PesquisaDuplicidade(old.lexema))
+                throw new ExceptionVariavelDuplicada("", old);
+            
             string tmp = token.lexema;
             
             Lexico();
@@ -197,6 +266,10 @@ namespace Compilador
             {
                 AnalisaBloco();
             }
+            
+            //TODO: pesquisar endereco
+            gerador.NULL("", "fim da funcao " + old.lexema);
+
             semantico.tabelaSimbolo.VoltaNivel();
         }
 
@@ -204,6 +277,8 @@ namespace Compilador
         {
             Lexico();
             ChecaSimboloEsperado(Simbolo.S_IDENTIFICADOR);
+
+            Token old = token;
 
             if (semantico.tabelaSimbolo.PesquisaDuplicidade(token.lexema))
                 throw new ExceptionVariavelDuplicada("", token);
@@ -213,6 +288,12 @@ namespace Compilador
             Lexico();
             ChecaSimboloEsperado(Simbolo.S_PONTO_VIRGULA);
             AnalisaBloco();
+
+            int count = semantico.tabelaSimbolo.NumeroDeVariaveisAlocadas();
+          
+            //TODO: pesquisa endereco
+            gerador.DEALLOC(0.ToString(), count.ToString());
+            gerador.RETURN(old.lexema, "fim do procedimento " + old.lexema);
 
             semantico.tabelaSimbolo.VoltaNivel();
         }
@@ -280,9 +361,13 @@ namespace Compilador
 
             Lexico();
             if (token.simbolo == Simbolo.S_ATRIBUICAO)
+            {
                 AnalisaAtribuicao(old); // ja leu um identificador?
+            }
             else
+            {
                 ChamadaProcedimento(old);
+            }
         }
 
         void ChamadaProcedimento(Token old)
@@ -298,9 +383,7 @@ namespace Compilador
             //Lexico();
             //ChecaSimboloEsperado(Simbolo.S_IDENTIFICADOR);
             // Lexico();
-        }
-
- 
+        } 
 
         void AnalisaAtribuicao(Token old)
         {
@@ -308,32 +391,110 @@ namespace Compilador
 
             if (simbolo == null)
                 throw new ExceptionVariavelNaoDeclarada("", old);
-
-
+                                   
             Lexico();
             /*ChecaSimboloEsperado(Simbolo.S_IDENTIFICADOR);
             Lexico();
             ChecaSimboloInesperado(Simbolo.S_ATRIBUICAO);
             Lexico();*/
             semantico.ReinicializaPosFixa();
+
             SimboloTipo tipo2 = AnalisaExpressao();
+
             if(!MesmoTipo(simbolo.tipo,tipo2))
                 throw new ExceptionTipoInvalido("", simbolo.tipo, tipo2, old); 
 
             semantico.FinalizaPosFixa();
+            FinalizaExpressao();
+
+            if (simbolo.tipo == SimboloTipo.FUNCAO_BOOLEANO || simbolo.tipo == SimboloTipo.FUNCAO_INTEIRO)
+            {
+                // Analisa retorno
+                SimboloInfo escopo = semantico.tabelaSimbolo.PesquisaEscopo();
+
+                if (escopo == null || escopo.tipo != SimboloTipo.FUNCAO_BOOLEANO && escopo.tipo != SimboloTipo.FUNCAO_INTEIRO)
+                    throw new ExceptionRetornoDeFuncaoInesperado("", old);
+                if (escopo.lexema != old.lexema)
+                    throw new ExceptionRetornoDeFuncaoInesperado("", old);
+
+                int count = semantico.tabelaSimbolo.NumeroDeVariaveisAlocadas();
+                //TODO: pesquisa endereco
+                gerador.RETURNF(0.ToString(), count.ToString(), "", "RETURNF da funcao " + escopo.lexema);
+            }
+            else
+            {
+                //TODO: pesquisa endereco
+                gerador.STR(old.lexema);
+            }
+        }
+
+        void FinalizaExpressao()
+        {
+            string comment = "expressao: ";
+
+            foreach (var token in semantico.posFixa)
+                comment += token.lexema + " ";            
+            gerador.NULL("", comment);
+
+            foreach (var token in semantico.posFixa)
+            {
+                if (token.simbolo == Simbolo.S_FUNCAO)
+                {
+                    //TODO: pesquisa endereco
+                    gerador.LDC(token.lexema);
+                }
+                if (token.simbolo == Simbolo.S_NUMERO)
+                    gerador.LDC(token.lexema);
+                else if (token.simbolo == Simbolo.S_VERDADEIRO)
+                    gerador.LDC(token.lexema);
+                else if (token.simbolo == Simbolo.S_FALSO)
+                    gerador.LDC(token.lexema);
+                else if (token.simbolo == Simbolo.S_MAIOR)
+                    gerador.CMA();
+                else if (token.simbolo == Simbolo.S_MENOR)
+                    gerador.CME();
+                else if (token.simbolo == Simbolo.S_MENOR_IG)
+                    gerador.CMEQ();
+                else if (token.simbolo == Simbolo.S_MAIOR_IG)
+                    gerador.CMAQ();
+                else if (token.simbolo == Simbolo.S_IG)
+                    gerador.CMEQ();
+                else if (token.simbolo == Simbolo.S_DIF)
+                    gerador.CDIF();
+                else if (token.simbolo == Simbolo.S_E)
+                    gerador.AND();
+                else if (token.simbolo == Simbolo.S_OU)
+                    gerador.OR();
+                else if (token.simbolo == Simbolo.S_MAIS)
+                    gerador.ADD();
+                else if (token.simbolo == Simbolo.S_MENOS)
+                    gerador.SUB();
+                else if (token.simbolo == Simbolo.S_DIV)
+                    gerador.DIVI();
+                else if (token.simbolo == Simbolo.S_MULT)
+                    gerador.MULT();
+                else if (token.simbolo == Simbolo.S_NAO)
+                    gerador.NEG();
+            }
         }
 
         void AnalisaSe()
         {
             Token old = token;
+
             Lexico();
+
             semantico.ReinicializaPosFixa();
+
             SimboloTipo tipo = AnalisaExpressao();
             if (!MesmoTipo(tipo, SimboloTipo.BOOLEANO))
                 throw new ExceptionTipoInvalido("", SimboloTipo.BOOLEANO, tipo, old); 
+
             semantico.FinalizaPosFixa();
             ChecaSimboloEsperado(Simbolo.S_ENTAO);
+
             Lexico();
+
             AnalisaComandoSimples();
             if (token.simbolo == Simbolo.S_SENAO)
             {
@@ -375,7 +536,7 @@ namespace Compilador
 
                 if (!MesmoTipo(tipo1, tipo2))
                     throw new ExceptionTipoInvalido("", tipo1, tipo2, token);              
-                return SimboloTipo.BOOLEANO;
+                tipo1 = SimboloTipo.BOOLEANO;
             }
 
             return tipo1;
@@ -420,7 +581,7 @@ namespace Compilador
                         throw new ExceptionTipoInvalido("", SimboloTipo.INTEIRO, tipo1, old);
                     if (!MesmoTipo(tipo2, SimboloTipo.INTEIRO))
                         throw new ExceptionTipoInvalido("", SimboloTipo.INTEIRO, tipo2, old);
-                    return SimboloTipo.INTEIRO;
+                    tipo1 = SimboloTipo.INTEIRO;
                 }
                 else if (old.simbolo == Simbolo.S_OU)
                 {
@@ -428,7 +589,7 @@ namespace Compilador
                         throw new ExceptionTipoInvalido("", SimboloTipo.BOOLEANO, tipo1, old);
                     if (!MesmoTipo(tipo2, SimboloTipo.BOOLEANO))
                         throw new ExceptionTipoInvalido("", SimboloTipo.BOOLEANO, tipo2, old);
-                    return SimboloTipo.BOOLEANO;
+                    tipo1 = SimboloTipo.BOOLEANO;
                 }
             }
 
@@ -501,7 +662,7 @@ namespace Compilador
                         throw new ExceptionTipoInvalido("", SimboloTipo.INTEIRO, tipo1, old);
                     if (!MesmoTipo(tipo2, SimboloTipo.INTEIRO))
                         throw new ExceptionTipoInvalido("", SimboloTipo.INTEIRO, tipo2, old);
-                    return SimboloTipo.INTEIRO;
+                    tipo1 = SimboloTipo.INTEIRO;
                 }
                 else if (old.simbolo == Simbolo.S_E)
                 {
@@ -509,7 +670,7 @@ namespace Compilador
                         throw new ExceptionTipoInvalido("", SimboloTipo.BOOLEANO, tipo1, old);
                     if (!MesmoTipo(tipo2, SimboloTipo.BOOLEANO))
                         throw new ExceptionTipoInvalido("", SimboloTipo.BOOLEANO, tipo2, old);
-                    return SimboloTipo.BOOLEANO;
+                    tipo1 = SimboloTipo.BOOLEANO;
                 }
             }
 

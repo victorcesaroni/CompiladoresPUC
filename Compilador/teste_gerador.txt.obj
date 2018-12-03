@@ -1,0 +1,27 @@
+             START       
+             JMP teste   
+f1           NULL         # inicio da funcao f1:FUNCAO_INTEIRO
+             NULL         # expressao: 2 
+             LDC 2       
+             RETURNF 0,0  # RETURNF da funcao f1
+             NULL         # fim da funcao f1
+p1           NULL         # inicio do procedimento p1
+             ALLOC 0,1   
+             NULL         # expressao: falso 
+             LDC falso   
+             STR b       
+             DEALLOC 0,1 
+p1           RETURN       # fim do procedimento p1
+teste        NULL         # inicio do programa teste
+             ALLOC 0,3   
+             NULL         # expressao: 0 1 1 1 + + f1 * - 
+             LDC 0       
+             LDC 1       
+             LDC 1       
+             LDC 1       
+             ADD         
+             ADD         
+             MULT        
+             SUB         
+             STR a       
+             HLT         

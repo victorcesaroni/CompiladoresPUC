@@ -64,6 +64,7 @@ namespace Compilador
         FUNCAO_INTEIRO,
         FUNCAO_BOOLEANO,
         PROCEDIMENTO,
+        PROGRAMA,
         INVALIDO,
     }
 
@@ -150,7 +151,19 @@ namespace Compilador
             }
             return null;
         }
-        
+
+        public SimboloInfo PesquisaEscopo()
+        {
+            for (int i = simbolos.Count - 1; i >= 0; i--)
+            {
+                if (simbolos[i].marca)
+                {
+                    return simbolos[i];
+                }
+            }
+            return null;
+        }
+
         public bool PesquisaFuncaoInteiro(string lexema)
         {
             for (int i = simbolos.Count - 1; i >= 0; i--)
@@ -162,13 +175,15 @@ namespace Compilador
             return false;
         }
 
-        public void VoltaNivel()
+        public int VoltaNivel()
         {
+            int count = 0;
             for (int i = simbolos.Count - 1; i >= 0; i--)
             {
                 if (!simbolos[i].marca)
                 {
                     simbolos.RemoveAt(i);
+                    count++;
                 }
                 else
                 {
@@ -176,7 +191,25 @@ namespace Compilador
                     break;
                 }
             }
-        }        
+            return count;
+        }
+
+        public int NumeroDeVariaveisAlocadas()
+        {
+            int count = 0;
+            for (int i = simbolos.Count - 1; i >= 0; i--)
+            {
+                if (!simbolos[i].marca)
+                {
+                    count++;
+                }
+                else
+                {
+                    break;
+                }
+            }
+            return count;
+        }
     }
 
     public class AnalisadorSemantico

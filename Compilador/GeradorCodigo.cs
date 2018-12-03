@@ -14,41 +14,46 @@ namespace Compilador
             this.arquivo = arquivo;
         }
 
-        public void Gera(string label, string asm)
+        public void Gera(string label, string asm, string comentario)
         {
-            if (label != "")
-                arquivo.Write(label + "\t");
-            arquivo.Write(asm + "\r\n");
+            String line = "";
+
+            if (comentario != "")
+                line = String.Format("{0,-12} {1,-12} # {2}\r\n", label, asm, comentario);
+            else
+                line = String.Format("{0,-12} {1,-12}\r\n", label, asm);
+
+            arquivo.Write(line);
         }
 
-        public void LDC(string var, string label = "") { Gera(label, "LDC " + var); }
-        public void LDV(string var, string label = "") { Gera(label, "LDV " + var); }
-        public void ADD(string label = "") { Gera(label, "ADD"); }
-        public void SUB(string label = "") { Gera(label, "SUB"); }
-        public void MULT(string label = "") { Gera(label, "MULT"); }
-        public void DIVI(string label = "") { Gera(label, "DIVI"); }
-        public void INV(string label = "") { Gera(label, "INV"); }
-        public void AND(string label = "") { Gera(label, "AND"); }
-        public void OR(string label = "") { Gera(label, "OR"); }
-        public void NEG(string label = "") { Gera(label, "NEG"); }
-        public void CME(string label = "") { Gera(label, "CME"); }
-        public void CMA(string label = "") { Gera(label, "CMA"); }
-        public void CMQ(string label = "") { Gera(label, "CMQ"); }
-        public void CDIF(string label = "") { Gera(label, "CDIF"); }
-        public void CMEQ(string label = "") { Gera(label, "CMEQ"); }
-        public void CMAQ(string label = "") { Gera(label, "CMAQ"); }
-        public void STAT(string label = "") { Gera(label, "START"); }
-        public void HLT(string label = "") { Gera(label, "HLT"); }
-        public void STR(string label = "") { Gera(label, "STR"); }
-        public void JMP(string to, string label = "") { Gera(label, "JMP " + to); }
-        public void JMPF(string to, string label = "") { Gera(label, "JMPF " + to); }
-        public void NULL(string label = "") { Gera(label, "NULL"); }
-        public void RD(string label = "") { Gera(label, "RD"); }
-        public void PRN(string label = "") { Gera(label, "PRN"); }
-        public void ALLOC(string m, string n, string label = "") { Gera(label, "ALLOC " + m + "," + n); }
-        public void DEALLOC(string m, string n, string label = "") { Gera(label, "DEALLOC " + m + "," + n); }
-        public void CALL(string to, string label = "") { Gera(label, "CALL " + to); }
-        public void RETURN(string label = "") { Gera(label, "RETURN"); }
-        public void RETURNF(string label = "") { Gera(label, "RETURNF"); }
+        public void LDC(string var, string label = "", string comentario = "") { Gera(label, "LDC " + var, comentario); }
+        public void LDV(string var, string label = "", string comentario = "") { Gera(label, "LDV " + var, comentario); }
+        public void ADD(string label = "", string comentario = "") { Gera(label, "ADD", comentario); }
+        public void SUB(string label = "", string comentario = "") { Gera(label, "SUB", comentario); }
+        public void MULT(string label = "", string comentario = "") { Gera(label, "MULT", comentario); }
+        public void DIVI(string label = "", string comentario = "") { Gera(label, "DIVI", comentario); }
+        public void INV(string label = "", string comentario = "") { Gera(label, "INV", comentario); }
+        public void AND(string label = "", string comentario = "") { Gera(label, "AND", comentario); }
+        public void OR(string label = "", string comentario = "") { Gera(label, "OR", comentario); }
+        public void NEG(string label = "", string comentario = "") { Gera(label, "NEG", comentario); }
+        public void CME(string label = "", string comentario = "") { Gera(label, "CME", comentario); }
+        public void CMA(string label = "", string comentario = "") { Gera(label, "CMA", comentario); }
+        public void CMQ(string label = "", string comentario = "") { Gera(label, "CMQ", comentario); }
+        public void CDIF(string label = "", string comentario = "") { Gera(label, "CDIF", comentario); }
+        public void CMEQ(string label = "", string comentario = "") { Gera(label, "CMEQ", comentario); }
+        public void CMAQ(string label = "", string comentario = "") { Gera(label, "CMAQ", comentario); }
+        public void START(string label = "", string comentario = "") { Gera(label, "START", comentario); }
+        public void HLT(string label = "", string comentario = "") { Gera(label, "HLT", comentario); }
+        public void STR(string var, string label = "", string comentario = "") { Gera(label, "STR " + var, comentario); }
+        public void JMP(string to, string label = "", string comentario = "") { Gera(label, "JMP " + to, comentario); }
+        public void JMPF(string to, string label = "", string comentario = "") { Gera(label, "JMPF " + to, comentario); }
+        public void NULL(string label = "", string comentario = "") { Gera(label, "NULL", comentario); }
+        public void RD(string label = "", string comentario = "") { Gera(label, "RD", comentario); }
+        public void PRN(string label = "", string comentario = "") { Gera(label, "PRN", comentario); }
+        public void ALLOC(string m, string n, string label = "", string comentario = "") { Gera(label, "ALLOC " + m + "," + n, comentario); }
+        public void DEALLOC(string m, string n, string label = "", string comentario = "") { Gera(label, "DEALLOC " + m + "," + n, comentario); }
+        public void CALL(string to, string label = "", string comentario = "") { Gera(label, "CALL " + to, comentario); }
+        public void RETURN(string label = "", string comentario = "") { Gera(label, "RETURN", comentario); }
+        public void RETURNF(string m, string n, string label = "", string comentario = "") { Gera(label, "RETURNF " + m + "," + n, comentario); }
     }
 }

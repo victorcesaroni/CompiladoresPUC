@@ -263,7 +263,6 @@ namespace Compilador
             }
             else if (c == '=')
             {
-                token.lexema += c.ToString();
                 token.simbolo = Simbolo.S_IG;
                 c = Ler();
             }
