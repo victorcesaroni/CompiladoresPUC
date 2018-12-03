@@ -44,6 +44,8 @@ namespace Compilador
         S_NAO,
         S_DOIS_PONTOS,
         S_FINAL_DE_ARQUIVO,
+        S_VERDADEIRO,
+        S_FALSO,
     };
 
     public class Token
@@ -104,7 +106,6 @@ namespace Compilador
             { "inteiro", Simbolo.S_INTEIRO },
             { "booleano", Simbolo.S_BOOLEANO },
             { "identificador", Simbolo.S_IDENTIFICADOR },
-            { "numero", Simbolo.S_NUMERO },
             { ".", Simbolo.S_PONTO },
             { ";", Simbolo.S_PONTO_VIRGULA },
             { ",", Simbolo.S_VIRGULA },
@@ -124,7 +125,10 @@ namespace Compilador
             { "ou", Simbolo.S_OU },
             { "nao", Simbolo.S_NAO },
             { ":", Simbolo.S_DOIS_PONTOS },
+            {"verdadeiro", Simbolo.S_VERDADEIRO },
+            {"falso", Simbolo.S_FALSO },
         };
+        
 
         public StreamReader arquivo;
         public ulong linha, coluna;

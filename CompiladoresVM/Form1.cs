@@ -217,5 +217,10 @@ namespace CompiladoresVM
                 e.SuppressKeyPress = true;
             }
         }
+
+        private void listViewMemoryProgram_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
     }
 }

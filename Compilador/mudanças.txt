@@ -1,0 +1,11 @@
+AnalisaEnquanto
+s_verdadeiro e s_falso
+"",S_NUMERO
+throw exception em declaracao de variavel
+chamada procedimento (old)
+s_ig em analise de expressao
+PesquisaDuplicidadeProcedimentoFuncao
+
+todos os testes semanticos: OK
+
+

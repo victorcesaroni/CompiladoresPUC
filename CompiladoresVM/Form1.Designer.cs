@@ -96,33 +96,33 @@
             this.abrirToolStripMenuItem,
             this.sairToolStripMenuItem});
             this.arquivoToolStripMenuItem.Name = "arquivoToolStripMenuItem";
-            this.arquivoToolStripMenuItem.Size = new System.Drawing.Size(56, 20);
+            this.arquivoToolStripMenuItem.Size = new System.Drawing.Size(61, 20);
             this.arquivoToolStripMenuItem.Text = "Arquivo";
             // 
             // abrirToolStripMenuItem
             // 
             this.abrirToolStripMenuItem.Name = "abrirToolStripMenuItem";
-            this.abrirToolStripMenuItem.Size = new System.Drawing.Size(97, 22);
+            this.abrirToolStripMenuItem.Size = new System.Drawing.Size(100, 22);
             this.abrirToolStripMenuItem.Text = "Abrir";
             this.abrirToolStripMenuItem.Click += new System.EventHandler(this.abrirToolStripMenuItem_Click);
             // 
             // sairToolStripMenuItem
             // 
             this.sairToolStripMenuItem.Name = "sairToolStripMenuItem";
-            this.sairToolStripMenuItem.Size = new System.Drawing.Size(97, 22);
+            this.sairToolStripMenuItem.Size = new System.Drawing.Size(100, 22);
             this.sairToolStripMenuItem.Text = "Sair";
             // 
             // executarToolStripMenuItem
             // 
             this.executarToolStripMenuItem.Name = "executarToolStripMenuItem";
-            this.executarToolStripMenuItem.Size = new System.Drawing.Size(62, 20);
+            this.executarToolStripMenuItem.Size = new System.Drawing.Size(63, 20);
             this.executarToolStripMenuItem.Text = "Executar";
             this.executarToolStripMenuItem.Click += new System.EventHandler(this.executarToolStripMenuItem_Click);
             // 
             // continuarToolStripMenuItem
             // 
             this.continuarToolStripMenuItem.Name = "continuarToolStripMenuItem";
-            this.continuarToolStripMenuItem.Size = new System.Drawing.Size(87, 20);
+            this.continuarToolStripMenuItem.Size = new System.Drawing.Size(91, 20);
             this.continuarToolStripMenuItem.Text = "Passo a passo";
             this.continuarToolStripMenuItem.Click += new System.EventHandler(this.continuarToolStripMenuItem_Click);
             // 
@@ -145,6 +145,7 @@
             this.listViewMemoryProgram.TabIndex = 5;
             this.listViewMemoryProgram.UseCompatibleStateImageBehavior = false;
             this.listViewMemoryProgram.View = System.Windows.Forms.View.Details;
+            this.listViewMemoryProgram.SelectedIndexChanged += new System.EventHandler(this.listViewMemoryProgram_SelectedIndexChanged);
             this.listViewMemoryProgram.KeyDown += new System.Windows.Forms.KeyEventHandler(this.listViewMemoryProgram_KeyDown);
             // 
             // columnHeader1
@@ -187,19 +188,19 @@
             this.adicionarBreakpointToolStripMenuItem,
             this.removerBreakpointToolStripMenuItem1});
             this.contextMenuStripBreakpoint.Name = "contextMenuStripBreakpoint";
-            this.contextMenuStripBreakpoint.Size = new System.Drawing.Size(173, 48);
+            this.contextMenuStripBreakpoint.Size = new System.Drawing.Size(186, 48);
             // 
             // adicionarBreakpointToolStripMenuItem
             // 
             this.adicionarBreakpointToolStripMenuItem.Name = "adicionarBreakpointToolStripMenuItem";
-            this.adicionarBreakpointToolStripMenuItem.Size = new System.Drawing.Size(172, 22);
+            this.adicionarBreakpointToolStripMenuItem.Size = new System.Drawing.Size(185, 22);
             this.adicionarBreakpointToolStripMenuItem.Text = "Adicionar breakpoint";
             this.adicionarBreakpointToolStripMenuItem.Click += new System.EventHandler(this.adicionarBreakpointToolStripMenuItem_Click);
             // 
             // removerBreakpointToolStripMenuItem1
             // 
             this.removerBreakpointToolStripMenuItem1.Name = "removerBreakpointToolStripMenuItem1";
-            this.removerBreakpointToolStripMenuItem1.Size = new System.Drawing.Size(172, 22);
+            this.removerBreakpointToolStripMenuItem1.Size = new System.Drawing.Size(185, 22);
             this.removerBreakpointToolStripMenuItem1.Text = "Remover breakpoint";
             this.removerBreakpointToolStripMenuItem1.Click += new System.EventHandler(this.removerBreakpointToolStripMenuItem1_Click);
             // 
@@ -302,13 +303,13 @@
             // labelI
             // 
             this.labelI.Name = "labelI";
-            this.labelI.Size = new System.Drawing.Size(24, 17);
+            this.labelI.Size = new System.Drawing.Size(22, 17);
             this.labelI.Text = "I: 0";
             // 
             // labelS
             // 
             this.labelS.Name = "labelS";
-            this.labelS.Size = new System.Drawing.Size(26, 17);
+            this.labelS.Size = new System.Drawing.Size(25, 17);
             this.labelS.Text = "S: 0";
             // 
             // Form1

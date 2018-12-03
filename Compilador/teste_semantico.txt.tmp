@@ -1,14 +1,36 @@
-programa teste; {ERRO expressão nao booleanoa}
-var x,a,b,c,z:inteiro;
-           
+{Teste erro operador relacional}
+programa test1;
+
+var a,b,c: inteiro;
+
+{proc 1}
+procedimento analisa1 ;
+var a, x: inteiro ;
+       z:booleano;
 inicio
- x:=1;
- a:=2;
- b:=3;
- c:=7;
- z:=1;
- enquanto (x)          {ERRO expressão nao booleanoa}
- faca inicio
-      escreva(x)
-    fim
+  se x=1  entao
+      x:= 0;
+  leia(z);
+  enquanto (a != 89) e (a<= 1000)  {condicao de parada}
+  faca inicio
+           a:= x+z
+       fim;
+  escreva(a)
+fim;
+
+
+procedimento analisa2;
+inicio
+  leia(a);
+  b:= a*a+(c div b) 
+fim;
+
+inicio
+    analisa1;
+    analisa2;
+    se b > (c+ a*a)
+    entao escreva(b)
+    senao escreva(c)
 fim.
+
+{fim}   

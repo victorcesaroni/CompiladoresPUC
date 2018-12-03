@@ -1,0 +1,15 @@
+C:\Users\15108244\Downloads\CompiladoresPUC-master\IDE\obj\Debug\IDE.csprojResolveAssemblyReference.cache
+C:\Users\15108244\Downloads\CompiladoresPUC-master\IDE\obj\Debug\IDE.Properties.Resources.resources
+C:\Users\15108244\Downloads\CompiladoresPUC-master\IDE\obj\Debug\IDE.csproj.GenerateResource.cache
+C:\Users\15108244\Downloads\CompiladoresPUC-master\IDE\bin\Debug\IDE.exe.config
+C:\Users\15108244\Downloads\CompiladoresPUC-master\IDE\bin\Debug\IDE.exe
+C:\Users\15108244\Downloads\CompiladoresPUC-master\IDE\bin\Debug\IDE.pdb
+C:\Users\15108244\Downloads\CompiladoresPUC-master\IDE\bin\Debug\Compilador.exe
+C:\Users\15108244\Downloads\CompiladoresPUC-master\IDE\bin\Debug\FastColoredTextBox.dll
+C:\Users\15108244\Downloads\CompiladoresPUC-master\IDE\bin\Debug\Compilador.pdb
+C:\Users\15108244\Downloads\CompiladoresPUC-master\IDE\bin\Debug\FastColoredTextBox.xml
+C:\Users\15108244\Downloads\CompiladoresPUC-master\IDE\obj\Debug\IDE.Form1.resources
+C:\Users\15108244\Downloads\CompiladoresPUC-master\IDE\obj\Debug\IDE.csproj.CoreCompileInputs.cache
+C:\Users\15108244\Downloads\CompiladoresPUC-master\IDE\obj\Debug\IDE.csproj.CopyComplete
+C:\Users\15108244\Downloads\CompiladoresPUC-master\IDE\obj\Debug\IDE.exe
+C:\Users\15108244\Downloads\CompiladoresPUC-master\IDE\obj\Debug\IDE.pdb

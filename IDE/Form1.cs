@@ -82,13 +82,14 @@ namespace IDE
             Save();
 
             analisadorSintatico = new AnalisadorSintatico(path);
-
+            //analisadorSintatico.Iniciar();
             try
             {
                 analisadorSintatico.Iniciar();
 
                 listViewError.Items.Add(new ListViewItem(new string[] { "0", "0", "Compilacao terminou com sucesso" }));
             }
+            
             catch (ExceptionErroLexical ex)
             {
                 Range rng = new Range(textBoxEditor, (int)ex.coluna, (int)ex.linha, (int)ex.coluna + 1, (int)ex.linha);
@@ -192,7 +193,8 @@ namespace IDE
                             token.simbolo == Simbolo.S_SENAO ||
                             token.simbolo == Simbolo.S_ENTAO ||
                             token.simbolo == Simbolo.S_VAR ||
-                            token.simbolo == Simbolo.S_ENQUANTO)
+                            token.simbolo == Simbolo.S_ENQUANTO ||
+                            token.simbolo == Simbolo.S_FUNCAO)
                         {
                             rng.SetStyle(blueStyle);
                         }
@@ -248,6 +250,11 @@ namespace IDE
         private void textBoxEditor_TextChangedDelayed(object sender, TextChangedEventArgs e)
         {
             Colorir();
+        }
+
+        private void textBoxEditor_Load(object sender, EventArgs e)
+        {
+
         }
     }
 }

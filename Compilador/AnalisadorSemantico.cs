@@ -17,7 +17,7 @@ namespace Compilador
 
         public override string ToString()
         {
-            return info + " " + "Variável '" + token.lexema + "'já declarada";
+            return info + " " + "Variável/Procedimento '" + token.lexema + "' já declarada(o)";
         }
     }
     public class ExceptionVariavelNaoDeclarada : Exception
@@ -110,13 +110,14 @@ namespace Compilador
             for (int i = simbolos.Count - 1; i >= 0; i--)
             {
                 if (simbolos[i].lexema == lexema &&
-                    simbolos[i].tipo == SimboloTipo.PROCEDIMENTO ||
+                    (simbolos[i].tipo == SimboloTipo.PROCEDIMENTO ||
                     simbolos[i].tipo == SimboloTipo.FUNCAO_INTEIRO ||
-                    simbolos[i].tipo == SimboloTipo.FUNCAO_BOOLEANO)
+                    simbolos[i].tipo == SimboloTipo.FUNCAO_BOOLEANO))
                     return true;
             }
             return false;
         }
+
 
         public bool PesquisaDuplicidade(string lexema)
         {

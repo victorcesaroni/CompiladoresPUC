@@ -290,19 +290,24 @@ namespace Compilador
             SimboloInfo simbolo = semantico.tabelaSimbolo.Pesquisa(old.lexema);
 
             if (simbolo == null)
-                throw new ExceptionVariavelNaoDeclarada("", token);
+                throw new ExceptionVariavelNaoDeclarada("Procedimento nao declarado", old);
+
+            if (simbolo.tipo != SimboloTipo.PROCEDIMENTO)
+                throw new ExceptionTipoInvalido("", SimboloTipo.PROCEDIMENTO, simbolo.tipo, old);
 
             //Lexico();
             //ChecaSimboloEsperado(Simbolo.S_IDENTIFICADOR);
-           // Lexico();
+            // Lexico();
         }
+
+ 
 
         void AnalisaAtribuicao(Token old)
         {
             SimboloInfo simbolo = semantico.tabelaSimbolo.Pesquisa(old.lexema);
 
             if (simbolo == null)
-                throw new ExceptionVariavelNaoDeclarada("", token);
+                throw new ExceptionVariavelNaoDeclarada("", old);
 
 
             Lexico();
@@ -339,9 +344,12 @@ namespace Compilador
 
         void AnalisaEnquanto()
         {
+            Token old = token;
             Lexico();
             semantico.ReinicializaPosFixa();
-            AnalisaExpressao();
+            SimboloTipo tipo = AnalisaExpressao();
+            if (!MesmoTipo(tipo, SimboloTipo.BOOLEANO))
+                throw new ExceptionTipoInvalido("", SimboloTipo.BOOLEANO, tipo, old);
             semantico.FinalizaPosFixa();
 
             ChecaSimboloEsperado(Simbolo.S_FACA);
@@ -358,7 +366,8 @@ namespace Compilador
                 token.simbolo == Simbolo.S_MENOR || 
                 token.simbolo == Simbolo.S_MAIOR_IG || 
                 token.simbolo == Simbolo.S_MENOR_IG || 
-                token.simbolo == Simbolo.S_DIF)
+                token.simbolo == Simbolo.S_DIF ||
+                token.simbolo == Simbolo.S_IG)
             {
                 semantico.ParaPosFixa(token);
                 Lexico();
@@ -466,6 +475,7 @@ namespace Compilador
             ChecaSimboloEsperado(Simbolo.S_IDENTIFICADOR);
 
             SimboloInfo simbolo = semantico.tabelaSimbolo.Pesquisa(token.lexema);
+            
 
             if (simbolo == null)
                 throw new ExceptionVariavelNaoDeclarada("", token);
@@ -564,9 +574,12 @@ namespace Compilador
                     if (token.simbolo == Simbolo.S_VIRGULA)
                     {
                         Lexico();
-                        ChecaSimboloInesperado(Simbolo.S_DOIS_PONTOS);
+                        //ChecaSimboloInesperado(Simbolo.S_DOIS_PONTOS);
+                        ChecaSimboloEsperado(Simbolo.S_IDENTIFICADOR);
                     }
                 }
+                else
+                    throw new ExceptionSimboloInesperado("", token);
 
                 if (lexico.FimDeArquivo() && token.simbolo != Simbolo.S_DOIS_PONTOS)
                     throw new ExceptionSimboloEsperado("Final de arquivo inesperado", Simbolo.S_DOIS_PONTOS, token);

@@ -174,6 +174,7 @@
             this.textBoxEditor.TabIndex = 0;
             this.textBoxEditor.Zoom = 100;
             this.textBoxEditor.TextChangedDelayed += new System.EventHandler<FastColoredTextBoxNS.TextChangedEventArgs>(this.textBoxEditor_TextChangedDelayed);
+            this.textBoxEditor.Load += new System.EventHandler(this.textBoxEditor_Load);
             // 
             // listBox1
             // 
