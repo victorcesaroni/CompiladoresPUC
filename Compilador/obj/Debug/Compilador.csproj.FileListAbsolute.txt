@@ -4,3 +4,8 @@ C:\Users\15108244\Downloads\CompiladoresPUC-master\Compilador\obj\Debug\Compilad
 C:\Users\15108244\Downloads\CompiladoresPUC-master\Compilador\obj\Debug\Compilador.csproj.CoreCompileInputs.cache
 C:\Users\15108244\Downloads\CompiladoresPUC-master\Compilador\obj\Debug\Compilador.exe
 C:\Users\15108244\Downloads\CompiladoresPUC-master\Compilador\obj\Debug\Compilador.pdb
+C:\Users\victor020717\Documents\CompiladoresPUC\Compilador\bin\Debug\Compilador.exe
+C:\Users\victor020717\Documents\CompiladoresPUC\Compilador\bin\Debug\Compilador.pdb
+C:\Users\victor020717\Documents\CompiladoresPUC\Compilador\obj\Debug\Compilador.csprojResolveAssemblyReference.cache
+C:\Users\victor020717\Documents\CompiladoresPUC\Compilador\obj\Debug\Compilador.exe
+C:\Users\victor020717\Documents\CompiladoresPUC\Compilador\obj\Debug\Compilador.pdb

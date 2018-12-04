@@ -3,6 +3,11 @@ var a,b : inteiro;
 
 funcao f2 : inteiro;
 var f:inteiro;
+    funcao f3 : inteiro;
+    var d : inteiro;
+    inicio
+        f3 := 2;
+    fim;
 inicio
     escreva(f);
     f2:=f;
@@ -12,13 +17,13 @@ var c : inteiro;
     funcao f3 : inteiro;
     var d : inteiro;
     inicio
-        f3 := 2;
+        f3 := 99999;
     fim;
 inicio
-    f1 := 2;
+    f1 := 2 + f3;
 fim;
 
 inicio
-    a:= -(1+1+1)*f1;
+    a:= -(1+1+1)*f1 + b;
     escreva(a);
 fim.

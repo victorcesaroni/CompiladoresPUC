@@ -70,27 +70,40 @@ namespace Compilador
 
     public class SimboloInfo
     {
-        public SimboloInfo(string lexema, SimboloTipo tipo, bool marca)
+        public SimboloInfo(string lexema, SimboloTipo tipo, bool marca, int endereco)
         {
             this.lexema = lexema;
             this.tipo = tipo;
             this.marca = marca;
+            this.endereco = endereco;
         }
 
         public string lexema;
         public SimboloTipo tipo;
         public bool marca;
+        public int endereco;
+        public string label;
     }
-    
+        
     public class TabelaSimbolo
     {
         public List<SimboloInfo> simbolos = new List<SimboloInfo>();
+        public ulong numeroDeProcFuncUsados = 0;
 
-        public void Insere(List<string> lexemas, SimboloTipo tipo, bool marca)
+        public void Insere(List<string> lexemas, SimboloTipo tipo, bool marca, int enderecoPilha = -1)
         {
             foreach (var item in lexemas)
             {
-                simbolos.Add(new SimboloInfo(item, tipo, marca));
+                simbolos.Add(new SimboloInfo(item, tipo, marca, enderecoPilha));
+
+                if (enderecoPilha != -1)
+                    enderecoPilha++;
+
+                if (tipo == SimboloTipo.PROCEDIMENTO || tipo == SimboloTipo.PROGRAMA || tipo == SimboloTipo.FUNCAO_INTEIRO || tipo == SimboloTipo.FUNCAO_BOOLEANO)
+                {
+                    simbolos[simbolos.Count - 1].label = item + "_" + numeroDeProcFuncUsados;
+                    numeroDeProcFuncUsados++;
+                }
             }
         }
 

@@ -133,6 +133,7 @@ namespace Compilador
             ChecaSimboloEsperado(Simbolo.S_PROGRAMA);
             Lexico();
             ChecaSimboloEsperado(Simbolo.S_IDENTIFICADOR);
+
             semantico.tabelaSimbolo.Insere(new List<string> { token.lexema }, SimboloTipo.PROGRAMA, true);
 
             gerador.START();
@@ -166,7 +167,7 @@ namespace Compilador
             {
                 if (escopo.tipo == SimboloTipo.PROGRAMA)
                 {
-                    gerador.NULL(nome, "inicio do programa " + nome);
+                    gerador.NULL(escopo.label, "inicio do programa " + nome);
 
                     if (count > 0)
                     {
@@ -176,7 +177,7 @@ namespace Compilador
                 if (escopo.tipo == SimboloTipo.FUNCAO_BOOLEANO || escopo.tipo == SimboloTipo.FUNCAO_INTEIRO)
                 {
                     //TODO: pesquisar endereco
-                    gerador.NULL(nome, "inicio da funcao " + nome + ":" + escopo.tipo.ToString());
+                    gerador.NULL(escopo.label, "inicio da funcao " + nome + ":" + escopo.tipo.ToString());
 
                     if (count > 0)
                     {
@@ -186,7 +187,7 @@ namespace Compilador
                 if (escopo.tipo == SimboloTipo.PROCEDIMENTO)
                 {
                     //TODO: pesquisar endereco
-                    gerador.NULL(nome, "inicio do procedimento " + nome);
+                    gerador.NULL(escopo.label, "inicio do procedimento " + nome);
 
                     if (count > 0)
                     {
@@ -380,6 +381,8 @@ namespace Compilador
             if (simbolo.tipo != SimboloTipo.PROCEDIMENTO)
                 throw new ExceptionTipoInvalido("", SimboloTipo.PROCEDIMENTO, simbolo.tipo, old);
 
+            gerador.CALL(simbolo.label);
+
             //Lexico();
             //ChecaSimboloEsperado(Simbolo.S_IDENTIFICADOR);
             // Lexico();
@@ -419,14 +422,12 @@ namespace Compilador
 
                 int count = semantico.tabelaSimbolo.NumeroDeVariaveisAlocadas();
                 int offset = semantico.tabelaSimbolo.NumeroDeVariaveisAlocadasNoTotal() - count;
-
-                //TODO: pesquisa endereco
+                
                 gerador.RETURNF(offset.ToString(), count.ToString(), "", "RETURNF da funcao " + escopo.lexema);
             }
             else
             {
-                //TODO: pesquisa endereco
-                gerador.STR(old.lexema);
+                gerador.STR(simbolo.endereco.ToString(), "", "STR " + simbolo.lexema);
             }
         }
 
@@ -440,10 +441,11 @@ namespace Compilador
 
             foreach (var token in semantico.posFixa)
             {
-                if (token.simbolo == Simbolo.S_FUNCAO)
+                if (token.simbolo == Simbolo.S_IDENTIFICADOR)
                 {
-                    //TODO: pesquisa endereco
-                    gerador.CALL(token.lexema);
+                    SimboloInfo simbolo = semantico.tabelaSimbolo.Pesquisa(token.lexema);
+                    if (simbolo.tipo == SimboloTipo.INTEIRO || simbolo.tipo == SimboloTipo.BOOLEANO)
+                        gerador.LDV(simbolo.endereco.ToString(), "", "LDV " + simbolo.lexema);
                 }
                 if (token.simbolo == Simbolo.S_NUMERO)
                     gerador.LDC(token.lexema);
@@ -639,9 +641,10 @@ namespace Compilador
 
             SimboloInfo simbolo = semantico.tabelaSimbolo.Pesquisa(token.lexema);
             
-
             if (simbolo == null)
                 throw new ExceptionVariavelNaoDeclarada("", token);
+
+            gerador.CALL(simbolo.label);
 
             Lexico();
             return simbolo.tipo;
@@ -758,11 +761,13 @@ namespace Compilador
         {
             if (token.simbolo != Simbolo.S_INTEIRO && token.simbolo != Simbolo.S_BOOLEANO)
                 throw new ExceptionSimboloInesperado("", token);
+            
+            int offset = semantico.tabelaSimbolo.NumeroDeVariaveisAlocadasNoTotal();
 
             if (token.simbolo == Simbolo.S_INTEIRO)
-                semantico.tabelaSimbolo.Insere(listaDeVar, SimboloTipo.INTEIRO, false);
+                semantico.tabelaSimbolo.Insere(listaDeVar, SimboloTipo.INTEIRO, false, offset);
             else if (token.simbolo == Simbolo.S_BOOLEANO)
-                semantico.tabelaSimbolo.Insere(listaDeVar, SimboloTipo.BOOLEANO, false);
+                semantico.tabelaSimbolo.Insere(listaDeVar, SimboloTipo.BOOLEANO, false, offset);
 
             Lexico();
         }
