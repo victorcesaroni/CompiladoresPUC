@@ -75,12 +75,16 @@ namespace Compilador
         public AnalisadorLexico lexico;
         public AnalisadorSemantico semantico;
         public GeradorCodigo gerador;
+        private ulong contadorSe = 0;
+        private ulong contadorEnquanto = 0;
 
         Token token = new Token();
 
         public AnalisadorSintatico(string caminhoArquivo)
         {
             arquivo = new StreamReader(new FileStream(caminhoArquivo, FileMode.Open));
+            if (File.Exists(caminhoArquivo + ".obj"))
+                File.WriteAllText(caminhoArquivo + ".obj", String.Empty);
             arquivoObjeto = new StreamWriter(new FileStream(caminhoArquivo + ".obj", FileMode.OpenOrCreate));
             lexico = new AnalisadorLexico(arquivo);
             semantico = new AnalisadorSemantico();
@@ -451,7 +455,17 @@ namespace Compilador
 
             foreach (var token in semantico.posFixa)
                 comment += token.lexema + " ";            
-            gerador.NULL("", comment);*/
+            gerador.NULL("", comment);*/            /* se (a + b) > (5 * x) 
+            
+                                                      ab+5x*>
+                                                      ldv a
+                                                      ldv b
+                                                      add
+                                                      ldc 5
+                                                      ldv x
+                                                      muçt
+                                                      cma
+             */
 
             foreach (var token in semantico.posFixa)
             {
@@ -496,8 +510,21 @@ namespace Compilador
             }
         }
 
+
+        /*
+         *  cma
+         *  jmpf senao
+         *  COMANDOS ENTAO
+         *  JMP PULA_SENAO
+         *  COMANDOS SENAO
+         *  JMP PULA_SENAO
+         *  
+         */
+
+
         void AnalisaSe()
         {
+            ulong aux;
             Token old = token;
 
             Lexico();
@@ -510,20 +537,34 @@ namespace Compilador
 
             semantico.FinalizaPosFixa();
             ChecaSimboloEsperado(Simbolo.S_ENTAO);
+            FinalizaExpressao();
+            gerador.JMPF("END_IF_" + contadorSe.ToString());
 
             Lexico();
 
+            aux = contadorSe;
+            contadorSe += 2;
+
             AnalisaComandoSimples();
+
             if (token.simbolo == Simbolo.S_SENAO)
             {
+                gerador.JMP("END_IF_" + (aux+1).ToString());
+                gerador.NULL("END_IF_" + aux.ToString());
+                aux++;
                 Lexico();
                 AnalisaComandoSimples();
             }
+            gerador.NULL("END_IF_" + aux.ToString());
         }
 
         void AnalisaEnquanto()
         {
+            ulong aux1, aux2;
             Token old = token;
+            aux1 = contadorEnquanto;
+            gerador.NULL("WHILE_" + contadorEnquanto.ToString());
+            contadorEnquanto++;
             Lexico();
             semantico.ReinicializaPosFixa();
             SimboloTipo tipo = AnalisaExpressao();
@@ -532,9 +573,15 @@ namespace Compilador
             semantico.FinalizaPosFixa();
 
             ChecaSimboloEsperado(Simbolo.S_FACA);
+            FinalizaExpressao();
+            aux2 = contadorEnquanto;
+            gerador.JMPF("END_WHILE_"+contadorEnquanto.ToString());
+            contadorEnquanto++;
 
             Lexico();
             AnalisaComandoSimples();
+            gerador.JMP("WHILE_" + aux1.ToString());
+            gerador.NULL("END_WHILE_" + aux2.ToString());
         }
 
         SimboloTipo AnalisaExpressao()
@@ -705,35 +752,47 @@ namespace Compilador
             ChecaSimboloEsperado(Simbolo.S_ABRE_PARENTESES);
             Lexico();
             ChecaSimboloEsperado(Simbolo.S_IDENTIFICADOR);
+            SimboloInfo s = semantico.tabelaSimbolo.Pesquisa(token.lexema);
 
             if (!semantico.tabelaSimbolo.PesquisaVariavelInteiro(token.lexema))
                 throw new ExceptionVariavelNaoDeclarada("", token);
 
             Lexico();
             ChecaSimboloEsperado(Simbolo.S_FECHA_PARENTESES);
+            gerador.RD();
+            gerador.STR(s.endereco.ToString());
             Lexico();
+
         }
 
         void AnalisaEscreva()
         {
+            
             Lexico();
             ChecaSimboloEsperado(Simbolo.S_ABRE_PARENTESES);
             Lexico();
             ChecaSimboloEsperado(Simbolo.S_IDENTIFICADOR);
+            SimboloInfo s = semantico.tabelaSimbolo.Pesquisa(token.lexema);
 
             if (!semantico.tabelaSimbolo.PesquisaVariavelInteiro(token.lexema) &&
                 !semantico.tabelaSimbolo.PesquisaFuncaoInteiro(token.lexema))
-            {
-                SimboloInfo s = semantico.tabelaSimbolo.Pesquisa(token.lexema);
-
+            { 
                 if (s != null)
                     throw new ExceptionTipoInvalido("", SimboloTipo.INTEIRO, s.tipo, token);
                 else
                     throw new ExceptionVariavelNaoDeclarada("", token);
             }
-
+            if(s.tipo == SimboloTipo.FUNCAO_INTEIRO)
+            {
+                gerador.CALL(s.label);
+            }
+            else
+            {
+                gerador.LDV(s.endereco.ToString());
+            }
             Lexico();
             ChecaSimboloEsperado(Simbolo.S_FECHA_PARENTESES);
+            gerador.PRN();
             Lexico();
         }
 

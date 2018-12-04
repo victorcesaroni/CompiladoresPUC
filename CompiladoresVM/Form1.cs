@@ -86,7 +86,7 @@ namespace CompiladoresVM
         private void UpdateInterface()
         {
             listViewMemoryData.Items.Clear();
-            for (int i = 0; i < vm.M.Count(); i++)
+            for (int i = 0; i <= vm.S; i++)
             {
                 var m = vm.M[i];
                 listViewMemoryData.Items.Add(new ListViewItem(new string[] { i.ToString(), m.ToString(), }));
@@ -96,8 +96,8 @@ namespace CompiladoresVM
             labelS.Text = "S: " + vm.S.ToString();
 
             listViewMemoryProgram.SelectedItems.Clear();
-            //listViewMemoryProgram.Items[vm.I - 1].Selected = true;
-            listViewMemoryProgram.Items[vm.I].Selected = true;
+            listViewMemoryProgram.Items[vm.I - 1].Selected = true;
+            //listViewMemoryProgram.Items[vm.I].Selected = true;
             //listViewMemoryProgram.Items[vm.I].BackColor = Color.Green;
             listViewMemoryProgram.EnsureVisible(vm.I - 1);
 

@@ -40,8 +40,15 @@ namespace CompiladoresVM
 
             public Instruction(string text)
             {
-                text = text.Replace("\t", " ");
-                text = text.Replace("  ", " ");
+                int length = text.Length;
+                while (true)
+                {
+                    text = text.Replace("\t", " ");
+                    text = text.Replace("  ", " ");
+                    if (text.Length == length)
+                        break;
+                    length = text.Length;
+                }
                 string[] s = text.Split(' ');
 
                 int commentIdx = text.IndexOf("#");

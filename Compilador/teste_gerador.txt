@@ -1,18 +1,16 @@
-programa teste;
+programa main;
 var a,b : inteiro;
-funcao f1:inteiro;
-inicio
-    f1:=10;
-fim;
-
-procedimento p1;
-inicio
-    b := 5;
-    escreva(b);
-fim;
 
 inicio
-    p1;
-    a:=f1+b;
-    escreva(a);
+    a := 0;
+    b := 0;
+    enquanto b < 3 faca
+    inicio
+        enquanto a < 3 faca
+            leia(a);
+        escreva(b);
+        b := b + 1;
+        a := 0;
+    fim
+    
 fim.

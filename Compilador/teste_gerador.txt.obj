@@ -1,17 +1,31 @@
              START       
-             JMP teste_0 
-f1_1         NULL         # inicio da funcao f1:FUNCAO_INTEIRO
-             LDC 10      
-             RETURNF 2,0  # RETURNF da funcao f1
-p1_2         NULL         # inicio do procedimento p1:PROCEDIMENTO
-             LDC 5       
-             STR 1        # STR b
-p1           RETURN       # p1
-teste_0      ALLOC 0,2    # inicio do programa teste
-             CALL p1_2   
-             CALL f1_1   
-             LDV 1        # LDV b
-             ADD         
+main_0       ALLOC 0,2    # inicio do programa main
+             LDC 0       
              STR 0        # STR a
-             HLT         
+             LDC 0       
+             STR 1        # STR b
+WHILE_0      NULL        
+             LDV 1        # LDV b
+             LDC 3       
+             CME         
+             JMPF END_WHILE_1
+WHILE_2      NULL        
+             LDV 0        # LDV a
+             LDC 3       
+             CME         
+             JMPF END_WHILE_3
+             RD          
+             STR 0       
+             JMP WHILE_2 
+END_WHILE_3  NULL        
+             LDV 1       
+             PRN         
+             LDV 1        # LDV b
+             LDC 1       
+             ADD         
+             STR 1        # STR b
+             LDC 0       
+             STR 0        # STR a
+             JMP WHILE_0 
+END_WHILE_1  NULL        
              HLT         
