@@ -137,7 +137,6 @@ namespace Compilador
             semantico.tabelaSimbolo.Insere(new List<string> { token.lexema }, SimboloTipo.PROGRAMA, true);
 
             gerador.START();
-            gerador.JMP(token.lexema);
 
             Lexico();
             ChecaSimboloEsperado(Simbolo.S_PONTO_VIRGULA);
@@ -147,8 +146,19 @@ namespace Compilador
             Lexico();
             if (token.simbolo != Simbolo.S_FINAL_DE_ARQUIVO)
                 throw new ExceptionSimboloInesperado("Inesperado apos final de programa", token);
-            
+
             gerador.HLT();
+        }
+
+        bool gerouJmpInicial = false;
+
+        void GeraJmpInicial()
+        {
+            if (gerouJmpInicial)
+                return;
+
+            gerador.JMP(semantico.tabelaSimbolo.simbolos[0].label);
+            gerouJmpInicial = true;
         }
 
         void AnalisaBloco()
@@ -167,31 +177,37 @@ namespace Compilador
             {
                 if (escopo.tipo == SimboloTipo.PROGRAMA)
                 {
-                    gerador.NULL(escopo.label, "inicio do programa " + nome);
-
                     if (count > 0)
                     {
-                        gerador.ALLOC(offset.ToString(), count.ToString());
+                        gerador.ALLOC(offset.ToString(), count.ToString(), escopo.label, "inicio do programa " + nome);
+                    }
+                    else
+                    {
+                        gerador.NULL(escopo.label, "inicio do programa " + nome);
                     }
                 }
                 if (escopo.tipo == SimboloTipo.FUNCAO_BOOLEANO || escopo.tipo == SimboloTipo.FUNCAO_INTEIRO)
                 {
-                    //TODO: pesquisar endereco
-                    gerador.NULL(escopo.label, "inicio da funcao " + nome + ":" + escopo.tipo.ToString());
-
+                    GeraJmpInicial();
                     if (count > 0)
                     {
-                        gerador.ALLOC(offset.ToString(), count.ToString());
+                        gerador.ALLOC(offset.ToString(), count.ToString(), escopo.label, "inicio da funcao " + nome + ":" + escopo.tipo.ToString());
+                    }
+                    else
+                    {
+                        gerador.NULL(escopo.label, "inicio da funcao " + nome + ":" + escopo.tipo.ToString());
                     }
                 }
                 if (escopo.tipo == SimboloTipo.PROCEDIMENTO)
                 {
-                    //TODO: pesquisar endereco
-                    gerador.NULL(escopo.label, "inicio do procedimento " + nome);
-
+                    GeraJmpInicial();
                     if (count > 0)
                     {
-                        gerador.ALLOC(offset.ToString(), count.ToString());
+                        gerador.ALLOC(offset.ToString(), count.ToString(), escopo.label, "inicio do procedimento " + nome + ":" + escopo.tipo.ToString());
+                    }
+                    else
+                    {
+                        gerador.NULL(escopo.label, "inicio do procedimento " + nome + ":" + escopo.tipo.ToString());
                     }
                 }
             }
@@ -267,9 +283,6 @@ namespace Compilador
                 AnalisaBloco();
             }
             
-            //TODO: pesquisar endereco
-            gerador.NULL("", "fim da funcao " + old.lexema);
-
             semantico.tabelaSimbolo.VoltaNivel();
         }
 
@@ -293,8 +306,9 @@ namespace Compilador
             int offset = semantico.tabelaSimbolo.NumeroDeVariaveisAlocadasNoTotal() - count;
 
             //TODO: pesquisa endereco
-            gerador.DALLOC(offset.ToString(), count.ToString());
-            gerador.RETURN(old.lexema, "fim do procedimento " + old.lexema);
+            if (count > 0)
+                gerador.DALLOC(offset.ToString(), count.ToString());
+            gerador.RETURN(old.lexema, "" + old.lexema);
 
             semantico.tabelaSimbolo.VoltaNivel();
         }
@@ -433,11 +447,11 @@ namespace Compilador
 
         void FinalizaExpressao()
         {
-            string comment = "expressao: ";
+            /*string comment = "expressao: ";
 
             foreach (var token in semantico.posFixa)
                 comment += token.lexema + " ";            
-            gerador.NULL("", comment);
+            gerador.NULL("", comment);*/
 
             foreach (var token in semantico.posFixa)
             {
@@ -640,11 +654,14 @@ namespace Compilador
             ChecaSimboloEsperado(Simbolo.S_IDENTIFICADOR);
 
             SimboloInfo simbolo = semantico.tabelaSimbolo.Pesquisa(token.lexema);
-            
+
             if (simbolo == null)
                 throw new ExceptionVariavelNaoDeclarada("", token);
 
-            gerador.CALL(simbolo.label);
+            if (simbolo.tipo == SimboloTipo.FUNCAO_INTEIRO || simbolo.tipo == SimboloTipo.FUNCAO_BOOLEANO)
+            {
+                gerador.CALL(simbolo.label);
+            }
 
             Lexico();
             return simbolo.tipo;

@@ -1,29 +1,18 @@
 programa teste;
 var a,b : inteiro;
-
-funcao f2 : inteiro;
-var f:inteiro;
-    funcao f3 : inteiro;
-    var d : inteiro;
-    inicio
-        f3 := 2;
-    fim;
+funcao f1:inteiro;
 inicio
-    escreva(f);
-    f2:=f;
+    f1:=10;
 fim;
-funcao f1 : inteiro;
-var c : inteiro;
-    funcao f3 : inteiro;
-    var d : inteiro;
-    inicio
-        f3 := 99999;
-    fim;
+
+procedimento p1;
 inicio
-    f1 := 2 + f3;
+    b := 5;
+    escreva(b);
 fim;
 
 inicio
-    a:= -(1+1+1)*f1 + b;
+    p1;
+    a:=f1+b;
     escreva(a);
 fim.

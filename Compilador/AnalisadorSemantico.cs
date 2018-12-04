@@ -76,6 +76,7 @@ namespace Compilador
             this.tipo = tipo;
             this.marca = marca;
             this.endereco = endereco;
+            this.label = "{**invalida**}";
         }
 
         public string lexema;

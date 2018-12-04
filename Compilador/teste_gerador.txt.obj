@@ -1,46 +1,17 @@
              START       
-             JMP teste   
-f3_2         NULL         # inicio da funcao f3:FUNCAO_INTEIRO
-             ALLOC 3,1   
-             NULL         # expressao: 2 
-             LDC 2       
-             RETURNF 3,1  # RETURNF da funcao f3
-             NULL         # fim da funcao f3
-f2_1         NULL         # inicio da funcao f2:FUNCAO_INTEIRO
-             ALLOC 2,1   
-             CALL        
-             NULL         # expressao: f 
-             LDV 2        # LDV f
-             RETURNF 2,1  # RETURNF da funcao f2
-             NULL         # fim da funcao f2
-f3_4         NULL         # inicio da funcao f3:FUNCAO_INTEIRO
-             ALLOC 3,1   
-             NULL         # expressao: 99999 
-             LDC 99999   
-             RETURNF 3,1  # RETURNF da funcao f3
-             NULL         # fim da funcao f3
-f1_3         NULL         # inicio da funcao f1:FUNCAO_INTEIRO
-             ALLOC 2,1   
-             CALL f3_4   
-             NULL         # expressao: 2 f3 + 
-             LDC 2       
-             ADD         
-             RETURNF 2,1  # RETURNF da funcao f1
-             NULL         # fim da funcao f1
-teste_0      NULL         # inicio do programa teste
-             ALLOC 0,2   
-             CALL f1_3   
-             CALL        
-             NULL         # expressao: 0 1 1 1 + + f1 * b + - 
-             LDC 0       
-             LDC 1       
-             LDC 1       
-             LDC 1       
-             ADD         
-             ADD         
-             MULT        
+             JMP teste_0 
+f1_1         NULL         # inicio da funcao f1:FUNCAO_INTEIRO
+             LDC 10      
+             RETURNF 2,0  # RETURNF da funcao f1
+p1_2         NULL         # inicio do procedimento p1:PROCEDIMENTO
+             LDC 5       
+             STR 1        # STR b
+p1           RETURN       # p1
+teste_0      ALLOC 0,2    # inicio do programa teste
+             CALL p1_2   
+             CALL f1_1   
              LDV 1        # LDV b
              ADD         
-             SUB         
              STR 0        # STR a
+             HLT         
              HLT         
