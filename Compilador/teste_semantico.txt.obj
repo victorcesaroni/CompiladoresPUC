@@ -1,0 +1,23 @@
+             START       
+             JMP test1   
+analisa1     NULL         # inicio do procedimento analisa1
+             ALLOC 0,3   
+             NULL         # expressao: 0 
+             LDC 0       
+             STR x       
+             NULL         # expressao: x z + 
+             ADD         
+             STR a       
+             DALLOC 0,3  
+analisa1     RETURN       # fim do procedimento analisa1
+analisa2     NULL         # inicio do procedimento analisa2
+             NULL         # expressao: a a * c b div + 
+             MULT        
+             DIVI        
+             ADD         
+             STR b       
+             DALLOC 0,0  
+analisa2     RETURN       # fim do procedimento analisa2
+test1        NULL         # inicio do programa test1
+             ALLOC 0,5   
+             HLT         

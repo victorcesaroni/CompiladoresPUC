@@ -136,6 +136,7 @@ namespace CompiladoresVM
                     case "DALLOC": return tmp;
                     case "CALL": return tmp;
                     case "RETURN": return tmp;
+                    case "RETURNF": return tmp;
                 };
 
                 throw new Exception("Invalid opcode");
@@ -173,6 +174,7 @@ namespace CompiladoresVM
                     case "DALLOC": return false;
                     case "CALL": return false;
                     case "RETURN": return false;
+                    case "RETURNF": return false;
                 };
 
                 try
@@ -220,6 +222,7 @@ namespace CompiladoresVM
                     case "DALLOC": return 2;
                     case "CALL": return 1;
                     case "RETURN": return 0;
+                    case "RETURNF": return 2;
                 };
 
                 throw new Exception("Invalid opcode");
@@ -257,6 +260,7 @@ namespace CompiladoresVM
                     case "DALLOC": return false;
                     case "CALL": return true;
                     case "RETURN": return false;
+                    case "RETURNF": return false;
                 };
 
                 throw new Exception("Invalid opcode");
@@ -520,6 +524,30 @@ namespace CompiladoresVM
                     case "RETURN":
                         I = M[S];
                         S--;
+                        break;
+                    case "RETURNF":
+                        {
+                            // salva topo
+                            int r = M[S];
+                            S--;
+
+                            // DALLOC
+                            int m = int.Parse(instruction.arg1);
+                            int n = int.Parse(instruction.arg2);
+                            for (int k = n - 1; k >= 0; k--)
+                            {
+                                S--;
+                                M[m + k] = M[S];
+                            }
+
+                            // RETURN
+                            I = M[S];
+                            S--;
+
+                            // restaura topo
+                            S++;
+                            M[S] = r;
+                        }
                         break;
                 };
             }

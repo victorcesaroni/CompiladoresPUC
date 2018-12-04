@@ -1,0 +1,11 @@
+	START
+	JMP inicio
+F1 	NULL
+	LDC 10
+	RETURNF 0,0
+inicio 	NULL
+	call F1
+	LDC 5
+	ADD
+	PRN
+HLT

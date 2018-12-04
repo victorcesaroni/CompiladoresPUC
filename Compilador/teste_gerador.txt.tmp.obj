@@ -1,24 +1,20 @@
              START       
              JMP teste   
-f2           NULL         # inicio da funcao f2:FUNCAO_INTEIRO
-             ALLOC 2,1   
-             NULL         # expressao: f 
-             RETURNF 2,1  # RETURNF da funcao f2
-             NULL         # fim da funcao f2
-f3           NULL         # inicio da funcao f3:FUNCAO_INTEIRO
-             ALLOC 3,1   
-             NULL         # expressao: 2 
-             LDC 2       
-             RETURNF 3,1  # RETURNF da funcao f3
-             NULL         # fim da funcao f3
+teste        NULL         # inicio do programa teste
+             ALLOC 0,2   
 f1           NULL         # inicio da funcao f1:FUNCAO_INTEIRO
              ALLOC 2,1   
              NULL         # expressao: 2 
              LDC 2       
              RETURNF 2,1  # RETURNF da funcao f1
              NULL         # fim da funcao f1
-teste        NULL         # inicio do programa teste
-             ALLOC 0,2   
+p1           NULL         # inicio do procedimento p1
+             ALLOC 2,1   
+             NULL         # expressao: falso 
+             LDC falso   
+             STR b       
+             DALLOC 0,1  
+p1           RETURN       # fim do procedimento p1
              NULL         # expressao: 0 1 1 1 + + f1 * - 
              LDC 0       
              LDC 1       
@@ -30,4 +26,11 @@ teste        NULL         # inicio do programa teste
              SUB         
              STR a       
              HLT         
+  MULT        
+             MULT        
+             MULT        
+             ADD         
+             ADD         
+             SUB         
+             STR a       
              HLT         

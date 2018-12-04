@@ -166,6 +166,9 @@ namespace IDE
             rng.ClearStyle(negritoStyle);
             rng.ClearStyle(salmonStyle);
             rng.ClearStyle(grayStyle);
+            rng.ClearStyle(blueNormalStyle);
+            rng.ClearStyle(salmonItallicStyle);
+            rng.ClearStyle(blackItallicStyle);
         }
 
         void Colorir()

@@ -1,0 +1,19 @@
+programa teste;
+var a,b : inteiro;
+
+funcao f1 : inteiro;
+var c : inteiro;
+inicio
+    f1 := 2;
+fim;
+
+procedimento p1;
+var b : booleano;
+inicio
+    b := falso;
+fim;
+
+inicio
+    a:= -(1+1+1)*f1;
+    escreva(a);
+fim.

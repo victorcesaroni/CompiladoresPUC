@@ -201,12 +201,24 @@ namespace Compilador
             {
                 if (!simbolos[i].marca)
                 {
-                    count++;
+                    if (simbolos[i].tipo == SimboloTipo.INTEIRO || simbolos[i].tipo == SimboloTipo.BOOLEANO)
+                        count++;
                 }
                 else
                 {
                     break;
                 }
+            }
+            return count;
+        }
+
+        public int NumeroDeVariaveisAlocadasNoTotal()
+        {
+            int count = 0;
+            for (int i = simbolos.Count - 1; i >= 0; i--)
+            {
+                if (simbolos[i].tipo == SimboloTipo.INTEIRO || simbolos[i].tipo == SimboloTipo.BOOLEANO)
+                    count++;
             }
             return count;
         }

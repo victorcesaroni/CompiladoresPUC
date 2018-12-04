@@ -1,15 +1,21 @@
 programa teste;
-var a : inteiro;
+var a,b : inteiro;
 
+funcao f2 : inteiro;
+var f:inteiro;
+inicio
+    escreva(f);
+    f2:=f;
+fim;
 funcao f1 : inteiro;
+var c : inteiro;
+    funcao f3 : inteiro;
+    var d : inteiro;
+    inicio
+        f3 := 2;
+    fim;
 inicio
     f1 := 2;
-fim;
-
-procedimento p1;
-var b : booleano;
-inicio
-    b := falso;
 fim;
 
 inicio

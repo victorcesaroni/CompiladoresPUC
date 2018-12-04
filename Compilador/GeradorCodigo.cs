@@ -51,7 +51,7 @@ namespace Compilador
         public void RD(string label = "", string comentario = "") { Gera(label, "RD", comentario); }
         public void PRN(string label = "", string comentario = "") { Gera(label, "PRN", comentario); }
         public void ALLOC(string m, string n, string label = "", string comentario = "") { Gera(label, "ALLOC " + m + "," + n, comentario); }
-        public void DEALLOC(string m, string n, string label = "", string comentario = "") { Gera(label, "DEALLOC " + m + "," + n, comentario); }
+        public void DALLOC(string m, string n, string label = "", string comentario = "") { Gera(label, "DALLOC " + m + "," + n, comentario); }
         public void CALL(string to, string label = "", string comentario = "") { Gera(label, "CALL " + to, comentario); }
         public void RETURN(string label = "", string comentario = "") { Gera(label, "RETURN", comentario); }
         public void RETURNF(string m, string n, string label = "", string comentario = "") { Gera(label, "RETURNF " + m + "," + n, comentario); }
