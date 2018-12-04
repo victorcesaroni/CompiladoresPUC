@@ -96,8 +96,8 @@ namespace CompiladoresVM
             labelS.Text = "S: " + vm.S.ToString();
 
             listViewMemoryProgram.SelectedItems.Clear();
-            listViewMemoryProgram.Items[vm.I - 1].Selected = true;
-            //listViewMemoryProgram.Items[vm.I].Selected = true;
+            //listViewMemoryProgram.Items[vm.I - 1].Selected = true;
+            listViewMemoryProgram.Items[vm.I].Selected = true;
             //listViewMemoryProgram.Items[vm.I].BackColor = Color.Green;
             listViewMemoryProgram.EnsureVisible(vm.I - 1);
 

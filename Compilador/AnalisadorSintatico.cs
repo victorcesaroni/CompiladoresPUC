@@ -312,7 +312,7 @@ namespace Compilador
             //TODO: pesquisa endereco
             if (count > 0)
                 gerador.DALLOC(offset.ToString(), count.ToString());
-            gerador.RETURN(old.lexema, "" + old.lexema);
+            gerador.RETURN("","" + old.lexema);
 
             semantico.tabelaSimbolo.VoltaNivel();
         }

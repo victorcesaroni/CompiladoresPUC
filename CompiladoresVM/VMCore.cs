@@ -517,8 +517,9 @@ namespace CompiladoresVM
                             int n = int.Parse(instruction.arg2);
                             for (int k = n - 1; k >= 0; k--)
                             {
-                                S--;
+                                //S--;
                                 M[m + k] = M[S];
+                                S--;
                             }
                         }
                         I++;
@@ -543,8 +544,9 @@ namespace CompiladoresVM
                             int n = int.Parse(instruction.arg2);
                             for (int k = n - 1; k >= 0; k--)
                             {
-                                S--;
+                                
                                 M[m + k] = M[S];
+                                S--;
                             }
 
                             // RETURN
