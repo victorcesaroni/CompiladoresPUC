@@ -1,34 +1,12 @@
              START       
-             JMP test_0  
-ler_2        NULL         # inicio do procedimento ler:PROCEDIMENTO
-             RD          
-             STR 2       
-             RD          
-             STR 3       
-             CALL soma_1 
-             PRN         
-             RETURN       # ler
-loop_3       ALLOC 4,1    # inicio do procedimento loop:PROCEDIMENTO
-             RD          
-             STR 4       
-             LDV 4        # LDV x
-             LDC 10      
-             CME         
-             JMPF END_IF_0
-             CALL ler_2  
-END_IF_0     NULL        
-             DALLOC 4,1  
-             RETURN       # loop
-soma_1       ALLOC 2,2    # inicio da funcao soma:FUNCAO_INTEIRO
-             CALL loop_3 
-             LDV 2        # LDV c
-             LDV 3        # LDV a
-             ADD         
-             RETURNF 2,2  # RETURNF da funcao soma
-             JMP __ERRO_FUNCAO_SEM_RETORNO
 test_0       ALLOC 0,2    # inicio do programa test
-             CALL soma_1 
-             PRN         
+             LDC 1       
+             STR 0        # STR a
+             LDV 0        # LDV a
+             NEG         
+             LDV 0        # LDV a
+             AND         
+             STR 1        # STR b
              HLT         
 __ERRO_FUNCAO_SEM_RETORNO NULL        
              LDC 99999   
