@@ -1,120 +1,46 @@
              START       
-             JMP testefinal2_0
-igual_2      NULL         # inicio da funcao igual:FUNCAO_BOOLEANO
-             LDV 0        # LDV a
-             LDC 5       
-             CMAQ        
-             JMPF END_IF_0
-             LDC verdadeiro
-             LDC verdadeiro
-             AND         
-             LDC falso   
-             OR          
-             RETURNF 4,0  # RETURNF da funcao igual
-             JMP END_IF_1
-END_IF_0     NULL        
-             LDC falso   
-             RETURNF 4,0  # RETURNF da funcao igual
-END_IF_1     NULL        
-dobro_1      ALLOC 2,2    # inicio da funcao dobro:FUNCAO_INTEIRO
+             JMP test_0  
+ler_2        NULL         # inicio do procedimento ler:PROCEDIMENTO
              RD          
-             STR 0       
-             CALL igual_2
-             JMPF END_IF_2
-             LDV 0        # LDV a
-             LDV 0        # LDV a
-             MULT        
-             STR 3        # STR x
-             JMP END_IF_3
-END_IF_2     NULL        
-             LDV 0        # LDV a
-             STR 3        # STR x
-END_IF_3     NULL        
-             LDV 3        # LDV x
-             RETURNF 2,2  # RETURNF da funcao dobro
-igual_4      NULL         # inicio da funcao igual:FUNCAO_BOOLEANO
-             LDV 0        # LDV a
-             LDC 5       
-             CMAQ        
-             JMPF END_IF_4
-             LDC 0       
-             LDC 3       
-             SUB         
-             LDC 0       
-             LDC 1       
-             SUB         
+             STR 2       
+             RD          
+             STR 3       
+             CALL soma_1 
+             PRN         
+             RETURN       # ler
+loop_3       ALLOC 4,1    # inicio do procedimento loop:PROCEDIMENTO
+             RD          
+             STR 4       
+             LDV 4        # LDV x
+             LDC 10      
              CME         
-             RETURNF 3,0  # RETURNF da funcao igual
-             JMP END_IF_5
-END_IF_4     NULL        
-             LDC 45      
-             LDC 3       
-             DIVI        
-             LDC 1004    
-             CMAQ        
-             RETURNF 3,0  # RETURNF da funcao igual
-END_IF_5     NULL        
-metade_3     ALLOC 2,1    # inicio da funcao metade:FUNCAO_INTEIRO
-             RD          
-             STR 0       
-             CALL igual_4
-             JMPF END_IF_6
-             LDV 0        # LDV a
-             LDC 2       
-             DIVI        
-             LDC 31      
+             JMPF END_IF_0
+             CALL ler_2  
+END_IF_0     NULL        
+             DALLOC 4,1  
+             RETURN       # loop
+soma_1       ALLOC 2,2    # inicio da funcao soma:FUNCAO_INTEIRO
+             CALL loop_3 
+             LDV 2        # LDV c
+             LDV 3        # LDV a
              ADD         
-             RETURNF 2,1  # RETURNF da funcao metade
-             JMP END_IF_7
-END_IF_6     NULL        
-             LDV 0        # LDV a
-             RETURNF 2,1  # RETURNF da funcao metade
-END_IF_7     NULL        
-fatorial_5   NULL         # inicio da funcao fatorial:FUNCAO_INTEIRO
-             LDV 1        # LDV w
-             LDC 1       
-             SUB         
-             STR 1        # STR w
-             LDV 1        # LDV w
-             LDC 0       
-             CMEQ        
-             JMPF END_IF_8
-             LDC 1       
-             RETURNF 2,0  # RETURNF da funcao fatorial
-             JMP END_IF_9
-END_IF_8     NULL        
-             CALL fatorial_5
-             LDV 1        # LDV w
-             MULT        
-             RETURNF 2,0  # RETURNF da funcao fatorial
-END_IF_9     NULL        
-ler_6        NULL         # inicio da funcao ler:FUNCAO_INTEIRO
-             RD          
-             STR 0       
-             LDV 0        # LDV a
-             RETURNF 2,0  # RETURNF da funcao ler
-testefinal2_0 ALLOC 0,2    # inicio do programa testefinal2
-             CALL ler_6  
-             LDC 1       
-             CMEQ        
-             JMPF END_IF_10
-             CALL metade_3
+             RETURNF 2,2  # RETURNF da funcao soma
+             JMP __ERRO_FUNCAO_SEM_RETORNO
+test_0       ALLOC 0,2    # inicio do programa test
+             CALL soma_1 
              PRN         
-END_IF_10    NULL        
-             CALL ler_6  
-             LDC 2       
-             CMEQ        
-             JMPF END_IF_12
-             CALL dobro_1
+             HLT         
+__ERRO_FUNCAO_SEM_RETORNO NULL        
+             LDC 99999   
              PRN         
-END_IF_12    NULL        
-             CALL ler_6  
-             LDC 3       
-             CMEQ        
-             JMPF END_IF_14
-             RD          
-             STR 1       
-             CALL fatorial_5
+             LDC 99999   
              PRN         
-END_IF_14    NULL        
+             LDC 99999   
+             PRN         
+             LDC 99999   
+             PRN         
+             LDC 99999   
+             PRN         
+             LDC 99999   
+             PRN         
              HLT         

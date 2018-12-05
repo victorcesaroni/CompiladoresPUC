@@ -335,6 +335,7 @@ namespace Compilador
             { "!=", 2 },
             { "e", 1 },
             { "ou", 0 },*/
+            { Simbolo.S_MENOS_U, 6 },
             { Simbolo.S_NAO, 5 },
             { Simbolo.S_MULT, 4 },
             { Simbolo.S_DIV, 4 },

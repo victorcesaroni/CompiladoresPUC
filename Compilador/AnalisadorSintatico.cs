@@ -150,8 +150,24 @@ namespace Compilador
             Lexico();
             if (token.simbolo != Simbolo.S_FINAL_DE_ARQUIVO)
                 throw new ExceptionSimboloInesperado("Inesperado apos final de programa", token);
-
+                        
             gerador.HLT();
+
+            gerador.NULL("__ERRO_FUNCAO_SEM_RETORNO");
+            gerador.LDC("99999");
+            gerador.PRN();
+            gerador.LDC("99999");
+            gerador.PRN();
+            gerador.LDC("99999");
+            gerador.PRN();
+            gerador.LDC("99999");
+            gerador.PRN();
+            gerador.LDC("99999");
+            gerador.PRN();
+            gerador.LDC("99999");
+            gerador.PRN();
+            gerador.HLT();
+
         }
 
         bool gerouJmpInicial = false;
@@ -288,6 +304,8 @@ namespace Compilador
             }
             
             semantico.tabelaSimbolo.VoltaNivel();
+
+            gerador.JMP("__ERRO_FUNCAO_SEM_RETORNO");
         }
 
         void AnalisaDeclaracaoProcedimento()
@@ -478,9 +496,9 @@ namespace Compilador
                 if (token.simbolo == Simbolo.S_NUMERO)
                     gerador.LDC(token.lexema);
                 else if (token.simbolo == Simbolo.S_VERDADEIRO)
-                    gerador.LDC(token.lexema);
+                    gerador.LDC("1");
                 else if (token.simbolo == Simbolo.S_FALSO)
-                    gerador.LDC(token.lexema);
+                    gerador.LDC("0");
                 else if (token.simbolo == Simbolo.S_MAIOR)
                     gerador.CMA();
                 else if (token.simbolo == Simbolo.S_MENOR)
@@ -507,6 +525,8 @@ namespace Compilador
                     gerador.MULT();
                 else if (token.simbolo == Simbolo.S_NAO)
                     gerador.NEG();
+                else if (token.simbolo == Simbolo.S_MENOS_U)
+                    gerador.INV();
             }
         }
 
@@ -623,16 +643,15 @@ namespace Compilador
             {
                 Lexico();
             }
-
+            
             if (token.simbolo == Simbolo.S_MENOS)
             {
-                semantico.ParaPosFixa(new Token(Simbolo.S_NUMERO, "0", 0, 0));
-                semantico.ParaPosFixa(token);
+                semantico.ParaPosFixa(new Token(Simbolo.S_MENOS_U, "-", 0, 0));
                 Lexico();
             }
 
             SimboloTipo tipo1 = AnalisaTermo();
-
+            
             while (token.simbolo == Simbolo.S_MAIS || token.simbolo == Simbolo.S_MENOS || token.simbolo == Simbolo.S_OU)
             {
                 semantico.ParaPosFixa(token);
@@ -742,7 +761,7 @@ namespace Compilador
                     tipo1 = SimboloTipo.BOOLEANO;
                 }
             }
-
+   
             return tipo1;
         }
 

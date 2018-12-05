@@ -46,6 +46,7 @@ namespace Compilador
         S_FINAL_DE_ARQUIVO,
         S_VERDADEIRO,
         S_FALSO,
+        S_MENOS_U,
     };
 
     public class Token
